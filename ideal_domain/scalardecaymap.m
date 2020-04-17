@@ -1,0 +1,44 @@
+function decayEstimate = scalardecaymap(x, M, parameter, regType)
+%SCALARDECAYMAP - Estimates stiffness by computing a proxy for the Taylor coefficient decay of a 0-dimensional IVP
+%
+%   SCALARDECAYMAP() - A more detailed description of the function
+%
+%   Syntax:
+%       output = SCALARDECAYMAP(input1, input2)
+%       [output1, output2] = SCALARDECAYMAP(input1, input2, input3)
+%    
+%   Inputs:
+%       input1 - Description
+%       input2 - Description
+%       input3 - Description
+%
+%   Outputs:
+%       output1 - Description
+%       output2 - Description
+%
+%   Subfunctions: none
+%   Classes required: none
+%   Other m-files required: none
+%   MAT-files required: none
+
+%   Author: Shane Kepley
+%   email: shane.kepley@rutgers.edu
+%   Date: 20-Feb-2020; Last revision: 9-Mar-2020
+
+if isequal(regType, 0)
+    orbit = RegCRTBPChart(x, 'Taylor', 0, M, parameter, regType);
+    orbit.rescaletime(eps(1));
+else
+    x1Full = CRTBP2reg(reshape(x, [], 4), parameter(1), regType);
+    x1 = reshape(x1Full(1:4), [], 1);
+    orbit = RegCRTBPChart(x1, 'Taylor', 0, M, parameter, regType);
+    orbit.rescaletime(eps(1));
+    regtime(orbit);
+end
+decayEstimate = orbit.Tau;
+end % end scalardecaymap
+
+% Revision History:
+%{
+
+%}
