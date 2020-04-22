@@ -45,7 +45,6 @@ edgeColor = p.Results.EdgeColor;
 faceAlpha = p.Results.FaceAlpha;
 
 %% set up patches for atlas
-disp('I used this one')
 globalSpace = evalNode{1};
 globalTime = evalNode{2};
 atlasDimension = length(evalNode);
