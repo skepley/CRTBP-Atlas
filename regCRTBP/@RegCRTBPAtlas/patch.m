@@ -1,15 +1,15 @@
-function varargout = CRTBPpatch(obj, evalNode, chartRegType, plotRegType, plotIdx, varargin)
-%CRTBPPATCH - Modified version of the Atlas patch method which includes hotswapping
+function varargout = patch(obj, evalNode, chartRegType, plotRegType, plotIdx, varargin)
+%PATCH - Modified version of the Atlas patch method which includes hotswapping
 %
-%   CRTBPPATCH() - A more detailed description of the function
+%   PATCH() - A more detailed description of the function
 %
 %   Syntax:
-%      CRTBPpatch(obj, {S,T}, R1, R2, plotIdx) plots the charts in the CRTBPatlas (obj) which are computed with respect to 
+%      PATCH(obj, {S,T}, R1, R2, plotIdx) plots the charts in the RegCRTBPAtlas (obj) which are computed with respect to 
 %       R1 (0, 1, or 2) regtype using coordinates with respect to the R2 regtype at the rectangular space/time mesh with nodes S and T
 %       respectively. plotIdx is a 2 or 3 vector which identifies which of the 5 or 6 (depending on f0, f1, or f2) coordinates should be plotted. 
 %    
 %   Inputs:
-%       obj - An atlas of CRTBP Charts
+%       obj - A RegCRTBPAtlas object  
 %       evalNode - {S, T} are both vectors of space and time evaluation nodes respectively. These nodes are computed in the GLOBAL parameterization domain.  
 %       chartRegType - An element of {0, 1, 2} to define which charts should be plotted. Use repeated calls for handling multiple regtypes in one plot. 
 %       plotRegType - An element of {0, 1, 2} to define which coordinates to plot in. 
@@ -25,7 +25,7 @@ function varargout = CRTBPpatch(obj, evalNode, chartRegType, plotRegType, plotId
 
 %   Author: Shane Kepley
 %   email: shane.kepley@rutgers.edu
-%   Date: 06-Feb-2020; Last revision: 06-Feb-2020
+%   Date: 06-Feb-2020; Last revision: 21-Apr-2020
 
 %% parse input 
 % parse input and varargin
@@ -45,6 +45,7 @@ edgeColor = p.Results.EdgeColor;
 faceAlpha = p.Results.FaceAlpha;
 
 %% set up patches for atlas
+disp('I used this one')
 globalSpace = evalNode{1};
 globalTime = evalNode{2};
 atlasDimension = length(evalNode);
@@ -142,9 +143,9 @@ end
 % patch('Faces', face, 'Vertices', vertex, 'FaceColor', patchColor, 'EdgeColor', 'none', 'FaceAlpha', .5);
 % patch('Faces', face, 'Vertices', vertex, 'FaceVertexCData', colorData, 'FaceColor', 'interp', 'EdgeColor', 'none');
 % patch('Faces', face, 'Vertices', vertex, 'FaceColor',patchColor,'EdgeColor',edgeColor,'FaceAlpha',.7);
-end % end CRTBPpatch
+end % end patch
 
 % Revision History:
 %{
-
+21-Apr-2020: Renamed to patch from CRTBPpatch. This is now an overloaded version of the patch method for the RegCRTBPAtlas class
 %}
