@@ -19,7 +19,7 @@ clear all
 clc
 computerPath = pcpath('mac');
 addpath(genpath([computerPath,'Dropbox/Matlab/SeqDE']))
-addpath(genpath('/Users/shane/Dropbox/Regularisation3bp/integrator'))
+addpath(genpath('/Users/shane/Dropbox/Regularisation3bp/CRTBP Atlas'))
 savePath = [computerPath, 'Desktop/CRTBP_collision_manifolds/'];
 
 %% ================================================== MAKE SOME CHOICES ==================================================

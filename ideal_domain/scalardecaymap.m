@@ -1,7 +1,5 @@
 function decayEstimate = scalardecaymap(x, M, parameter, regType)
-%SCALARDECAYMAP - Estimates stiffness by computing a proxy for the Taylor coefficient decay of a 0-dimensional IVP
-%
-%   SCALARDECAYMAP() - A more detailed description of the function
+%SCALARDECAYMAP - Evaluates the Taylor coefficient decay map for a 0-dimensional IVP
 %
 %   Syntax:
 %       output = SCALARDECAYMAP(input1, input2)

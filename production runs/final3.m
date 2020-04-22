@@ -21,7 +21,7 @@ clc
 % set paths for accessing and saving data
 computerPath = pcpath('mac');
 addpath(genpath([computerPath,'Dropbox/Matlab/SeqDE']))
-addpath(genpath('/Users/shane/Dropbox/Regularisation3bp/integrator'))
+addpath(genpath('/Users/shane/Dropbox/Regularisation3bp/CRTBP Atlas'))
 savePath = [computerPath, 'Desktop/CRTBP_collision_manifolds/'];
 
 % set file names to save manifold and collision data
