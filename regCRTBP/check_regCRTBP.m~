@@ -41,7 +41,10 @@ initialData = cat(2, 0.5*[p1+p2; p2-p1]', zeros(4,N-2));
 if isValid
     initialData = intval(initialData);
 end
-bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess, 'boundary', true);
+bd = RegCRTBPChart(initialData, basis, initialTime, truncation, par, regType, 'InitialScaling', tauGuess, 'boundary', true);
+
+% unstableBd(k) =  RegCRTBPChart(localUnstableBd, 'Taylor', 0, truncation, mu, 0, 'InitialScaling', tauGuess, 'boundary', true);
+
 
 % Integrate multiple timesteps
 bdCheck = @(obj, boundaryChart, maxTau)boundarycheck(obj, boundaryChart, maxTau, 'SubDivideParameter', subDivideParameter);

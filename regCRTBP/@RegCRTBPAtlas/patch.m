@@ -1,20 +1,22 @@
-function varargout = patch(obj, gridArray, plotIdx, varargin)
-%PATCH - Plot an atlas of Charts as a patch
+function varargout = CRTBPpatch(obj, evalNode, chartRegType, plotRegType, plotIdx, varargin)
+%CRTBPPATCH - Modified version of the Atlas patch method which includes hotswapping
 %
-%   PATCH() - A more detailed description of the function
+%   CRTBPPATCH() - A more detailed description of the function
 %
 %   Syntax:
-%       output = PATCH(input1, input2)
-%       [output1, output2] = PATCH(input1, input2, input3)
-%
+%      CRTBPpatch(obj, {S,T}, R1, R2, plotIdx) plots the charts in the CRTBPatlas (obj) which are computed with respect to 
+%       R1 (0, 1, or 2) regtype using coordinates with respect to the R2 regtype at the rectangular space/time mesh with nodes S and T
+%       respectively. plotIdx is a 2 or 3 vector which identifies which of the 5 or 6 (depending on f0, f1, or f2) coordinates should be plotted. 
+%    
 %   Inputs:
-%       obj - An atlas of Chart objects parameterized on a subset of [-1,1] x [0, Tau]
-%       gridArray - A cell array of global space and time evaluation nodes
-%       idx - coordinate indices to plot
+%       obj - An atlas of CRTBP Charts
+%       evalNode - {S, T} are both vectors of space and time evaluation nodes respectively. These nodes are computed in the GLOBAL parameterization domain.  
+%       chartRegType - An element of {0, 1, 2} to define which charts should be plotted. Use repeated calls for handling multiple regtypes in one plot. 
+%       plotRegType - An element of {0, 1, 2} to define which coordinates to plot in. 
+%       plotIdx - Use [1,3] for configuration space plots. For plotting one velocity component use [1, 3, 2] or [1, 3, 4].
 %
 %   Outputs:
-%       output1 - Description
-%       output2 - Description
+%       none
 %
 %   Subfunctions: none
 %   Classes required: none
@@ -23,15 +25,29 @@ function varargout = patch(obj, gridArray, plotIdx, varargin)
 
 %   Author: Shane Kepley
 %   email: shane.kepley@rutgers.edu
-%   Date: 19-Apr-2019; Last revision: 2-Nov-2019
+%   Date: 06-Feb-2020; Last revision: 06-Feb-2020
 
-% TODO:
-% 1. Pass patch plotting options through as varargs
+%% parse input 
+% parse input and varargin
+p = inputParser;
+addRequired(p, 'obj');
+addRequired(p, 'evalNode');
+addRequired(p, 'chartRegType');
+addRequired(p, 'plotRegType');
+addRequired(p, 'plotIdx');
+addParameter(p, 'FaceColor', 'interp')
+addParameter(p, 'EdgeColor', 'none')
+addParameter(p, 'FaceAlpha', 1)
 
-globalSpace = gridArray{1};
-globalTime = gridArray{2};
+parse(p, obj, evalNode, chartRegType, plotRegType, plotIdx, varargin{:})
+faceColor = p.Results.FaceColor;
+edgeColor = p.Results.EdgeColor;
+faceAlpha = p.Results.FaceAlpha;
 
-atlasDimension = length(gridArray);
+%% set up patches for atlas
+globalSpace = evalNode{1};
+globalTime = evalNode{2};
+atlasDimension = length(evalNode);
 if ~isequal(atlasDimension, 2)
     error('not implemented')
 end
@@ -47,8 +63,21 @@ maxSpace = max(globalSpace);
 minTime = min(globalTime);
 maxTime = max(globalTime);
 
+% filter out charts of the correct regtype
+regIdx = arrayfun(@(chart)isequal(chart.RegType, chartRegType), obj.Chart); % logical indices for charts in correct regtype
+regChart = obj.Chart(regIdx); % slice all charts in the correct regtype
+
+% define change of coordinate map which maps points in chartReg to points in the plot regtype which
+% may be different.
+if isequal(chartRegType, plotRegType)
+    map2plotreg = @(x)x; % identity map
+else
+    map2plotreg = @(x)CRTBP2reg(x(:,1:4), obj.Chart(1).Parameter(1), plotRegType - chartRegType);
+end
+
+clear iPatchCell iPatchArray iPatch2PlotRegType iPatchEval
 % main loop
-for iChart = obj.Chart
+for iChart = regChart % loop through charts of correct regtype
     % get global evaluation node data for this chart
     
     % filter out global time coordinates
@@ -86,29 +115,36 @@ for iChart = obj.Chart
     
     try
         iFace = delaunay(iEvalData(:,1), iEvalData(:,2)); % index triples for delaunay triangulation in space-time.
- 
         % get global vertex data for this chart
         iPatchCell = iChart.eval(iEvalData, 'GlobalTime', true, 'GlobalSpace', true); % cell array of evaluations
-        iPatchEval = cell2mat(iPatchCell(plotIdx)); % convert to data array consisting only of indices to plot
+        iPatchArray = cell2mat(iPatchCell); % n-by-k where n = 5 (f0) or 6 (f1 and f2)
+        iPatch2PlotRegType = map2plotreg(iPatchArray); % map each evaluation point to plot regtype
+        iPatchEval = iPatch2PlotRegType(:, plotIdx); % slice out coordinates to plot
         iVertex = mid(iPatchEval); % convert to floats if necessary
         vertexCount = size(vertex, 1); % current vertex count to shift global vertex indices of this chart
         vertex = [vertex;iVertex]; % append new vertices
         
         % get global face data for this chart
         colorData = [colorData; iEvalData(:,2)]; % append global time data for patch coloring
-        face = [face;iFace + vertexCount]; % start counting face labels from the previous end label
+        face = [face;iFace + vertexCount]; % start counting face labels from the previous end label        
     catch % exception handling to deal with bad calls to delaunay
         
     end
 end
 
 % plot it
-patch('Faces', face, 'Vertices', vertex, 'FaceVertexCData', colorData, 'FaceColor', 'interp', 'EdgeColor', 'none');
-end % end patch
+if strcmp(faceColor, 'interp')
+    patch('Faces', face, 'Vertices', vertex, 'FaceVertexCData', colorData, 'FaceColor', 'interp', 'EdgeColor', edgeColor, 'FaceAlpha', faceAlpha);
+else
+    patch('Faces', face, 'Vertices', vertex, 'FaceColor', faceColor, 'EdgeColor', edgeColor, 'FaceAlpha', faceAlpha);
+end
+
+% patch('Faces', face, 'Vertices', vertex, 'FaceColor', patchColor, 'EdgeColor', 'none', 'FaceAlpha', .5);
+% patch('Faces', face, 'Vertices', vertex, 'FaceVertexCData', colorData, 'FaceColor', 'interp', 'EdgeColor', 'none');
+% patch('Faces', face, 'Vertices', vertex, 'FaceColor',patchColor,'EdgeColor',edgeColor,'FaceAlpha',.7);
+end % end CRTBPpatch
 
 % Revision History:
 %{
-2-Nov-2019 - Fixed a bug which caused it to incorrectly attach charts to one another. Also changed the format so it takes
-        an array of independent grids and computes a meshgrid for each individual Chart instead of computing a single
-        meshgrid and indexing into it with each Chart. The pictures look much smoother this way.
+
 %}
