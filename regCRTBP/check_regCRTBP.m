@@ -45,7 +45,7 @@ bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regTy
 
 % Integrate multiple timesteps
 bdCheck = @(obj, boundaryChart, maxTau)boundarycheck(obj, boundaryChart, maxTau, 'SubDivideParameter', subDivideParameter);
-A = Atlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
+A = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
 while ~isempty(A.LeafStack)
     A.growboundary()
 end

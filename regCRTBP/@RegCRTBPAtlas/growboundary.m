@@ -28,7 +28,7 @@ function growboundary(obj, varargin)
 p = inputParser;
 addRequired(p, 'obj')
 addParameter(p, 'LastCoefficientNorm', eps(1)); % how should the time be rescaled
-addParameter(p, 'RegTime', @(chart)chart.TimeSpan); % global time normalization. By default integration time for the chart is already global. 
+addParameter(p, 'RegTime', @(chart)chart.regtime()); % global time normalization. By default integration time for the chart is already global. 
 
 
 parse(p, obj, varargin{:})

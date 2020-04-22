@@ -49,7 +49,7 @@ tauGuess = 0.1; % initial timestep to scale each Taylor step
 if isfile(unstableFileID) % check if unstable manifold is computed already
     disp('Using existing unstable manifold data')
     
-else % compute and save unstable manifold data
+else % compute and save unstable manifold data 
     disp('Computing new unstable manifold data')
     
     % first lift local L4 unstable manifold into phase space and get boundary

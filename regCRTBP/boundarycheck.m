@@ -37,14 +37,20 @@ addRequired(p, 'obj')
 addRequired(p, 'boundaryChart')
 addRequired(p, 'maxTau')
 addParameter(p, 'SubDivideParameter', [4, .1, 4])
+addParameter(p, 'HotSwap', true) % by default the charts will automatically apply the conjugacy maps to improve numerical conditioning
+
 
 parse(p, obj, boundaryChart, maxTau, varargin{:})
 subDivideParameter = p.Results.SubDivideParameter;
+hotSwap = p.Results.HotSwap; 
 
 % cell array of fitness check functions
-subdivisionRule = {@(obj, boundaryChart)rule1(obj, boundaryChart, subDivideParameter), ...
-    @(obj, boundaryChart)rule2(obj, boundaryChart, subDivideParameter)}; % check hotswap and tailratio
-% subdivisionRule = {@(obj, boundaryChart)rule2(obj, boundaryChart, subDivideParameter)}; % turn off hotswapping
+if hotSwap
+    subdivisionRule = {@(obj, boundaryChart)rule1(obj, boundaryChart, subDivideParameter),...
+        @(obj, boundaryChart)rule2(obj, boundaryChart, subDivideParameter)}; % check hotswap and tailratio
+else
+    subdivisionRule = {@(obj, boundaryChart)rule2(obj, boundaryChart, subDivideParameter)}; % turn off hotswapping
+end
 nRule = length(subdivisionRule);
 
 %% ---------------------- CRASH CONDITIONS ----------------------

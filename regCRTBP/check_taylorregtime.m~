@@ -19,14 +19,112 @@
 %   Date: 22-Apr-2020; Last revision: 22-Apr-2020
 
 %% ================================================== SECTION 1 ==================================================
-p = [3,6,-4,2]; % 3t^3 + 6t
+p = [3,6,-4,2]; % 3*t^3 + 6*t^2 - 4*t + 2
 pp = conv(p,p);
-ppI = polyint(pp)
+ppI = polyint(pp); % anitderivative of p^2
+ground_truth = diff(polyval(ppI, [1,0]))
+
+% my method
+d = size(p, 2);
+chk = sum(conv(p,p)./(2*d-1:-1:1))
+
 
 
 
 %% ================================================== SECTION 2 ==================================================
 
 
+clear all
+close all
+clc
+computerPath = pcpath('mac');
+addpath(genpath([computerPath,'Dropbox/Matlab/SeqDE']))
+addpath(genpath([computerPath, 'Dropbox/Regularisation3bp/CRTBP Atlas']))
+%% ================================================== MAKE SOME CHOICES ==================================================
+% Integrator parameters
+N = 10; % spatial truncation
+M = 25; % temporal truncation
+truncation = [M, N]; % set truncation vector
+subDivideParameter = [4, .1, 4]; % default is [4, .1, 4]
+basis = 'Taylor';
+mu = .25; % small mass primary
+isValid = false;
+hotSwap = false; % specify whether charts should swap based on the ideal domain map or not
+bdCheck = @(obj, boundaryChart, maxTau)boundarycheck(obj, boundaryChart, maxTau, 'SubDivideParameter', subDivideParameter,...
+    'HotSwap', hotSwap);
+odeOptions = odeset('RelTol',1e-13,'AbsTol',1e-13);
+
+% Integrator time stepping
+initialTime = 0;
+tDirection = 1;
+tauGuess = 0.1; % initial timestep to scale each Taylor step
+maxTau = .3;
+tf = linspace(0, maxTau, 250); % plotting time points
+regType = 1;
+
+switch regType
+    case 0  % =============== CHECK f_0 AGAINST RUNGE KUTTA ===============
+        parameter = mu;
+        % set up some initial data on a line
+        p1 = [0.7104, 0.2973, 0.2554, 0.2068];
+        p2 = p1 + 1e-4*ones(size(p1));
+        initialData = cat(2, 0.5*[p1+p2; p2-p1]', zeros(4,N-2));
+        bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess, 'boundary', true);
+        
+        % Integrate multiple timesteps
+        A0 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
+        while ~isempty(A0.LeafStack)
+            A0.growboundary()
+            %             A0.growboundary('RegTime', @(chart)chart.TimeSpan) % do not regularize time
+        end
+        
+        % plot orbits
+        figure;
+        hold on
+        s = 0;
+        ob = mid(A0.orbit(s, tf));
+        
+        
+        plot3(ob(:,1), ob(:,3), ob(:,2), 'k', 'LineWidth',2)
+        
+        % set up rk45 evaluation
+        VF = @(t,x)rk45regvectorfield(t,x,parameter,regType);
+        initCondition = ob(1,:)';
+        [~,sol] = ode45(VF,tf,initCondition,odeOptions);
+        plot3(sol(:,1),sol(:,3),sol(:,2),'go')
+        view(-50,50)
+        
+    case 1  % =============== CHECK f_1 AGAINST RUNGE KUTTA ===============
+        C = 3;
+        parameter = [mu,C];
+        
+        % set up some initial data on a line
+        p1 = [0.7104, 0.2973, 0.2554, 0.2068];
+        p2 = p1 + 1e-4*ones(size(p1));
+        initialData = cat(2, 0.5*[p1+p2; p2-p1]', zeros(4,N-2));
+        % Integrate multiple timesteps
+        bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess, 'boundary', true);
+        maxTau = .3;
+        A1 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
+        while ~isempty(A1.LeafStack)
+            %             A1.growboundary()
+            A1.growboundary('RegTime', @(chart)chart.TimeSpan) % do not regularize time
+        end
+end
+
+% apply Taylor regtime
+tauChart = A1.Chart(1).deepcopy();
+x1 = tauChart.Coordinate(1);
+y1 = tauChart.Coordinate(3);
+x = x1.Coefficient(:,1);
+y = y1.Coefficient(:,1);
+% my method
+M = tauChart.Truncation(1);
+chk = sum(conv(p,p)./(2*d-1:-1:1))
+
+
+% apply existing regtime algorithm
+tChart = A1.Chart(1);
+tChart.regtime()
 
 

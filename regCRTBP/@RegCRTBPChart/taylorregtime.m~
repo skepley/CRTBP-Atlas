@@ -23,13 +23,22 @@ switch obj.RegType
     case 0 % chart is already in f_0 coordinates
         return
     otherwise % chart is in f_1 or f_2
-        x_i = obj.Coordinate(1).Coefficient(:,1); % Taylor expansion in time for the orbit through x_i(0)
-        y_i = obj.Coordinate(3).Coefficient(:,1); % Taylor expansion in time for the orbit through x_i(0)
-        M = obj.Truncation(1); % Truncation size in time
-        t = 4*obj.Tau*(sum(conv(x_i, x_i)./(1:2*M-1).') + sum(conv(y_i, y_i)./(1:2*M-1).')); % integrate dt/dTau_i
-        obj.Tau = t; % update step size
-        obj.TimeSpan = [obj.TimeSpan(1), obj.TimeSpan(1) + t]; % update TimeSpan with correct f_0 time
-end
+    x_i = obj.Coordinate(1).Coefficient(:,1); % Taylor expansion in time for the orbit through x_i(0)
+    y_i = obj.Coordinate(3).Coefficient(:,1); % Taylor expansion in time for the orbit through x_i(0)
+
+
+    M = tauChart.Truncation(1);
+    chk = 4*tauChart.Tau*(sum(conv(x,x)./(1:2*M-1).') + sum(conv(y,y)./(1:2*M-1).'))
+
+
+        initialCondition = obj.eval([0,0]); % get an initial point on the chart
+        F = @(t,x)rk45regvectorfield(t, x, obj.Parameter, obj.RegType);
+        [tau, Fsol] = ode45(F, obj.TimeSpan, [initialCondition{:}]', odeset('AbsTol',1e-13));
+        w = Fsol(:,1).^2 + Fsol(:,3).^2;
+        F0Tau = 4*trapz(tau,w);
+        obj.TimeSpan = [obj.TimeSpan(1), obj.TimeSpan(1) + F0Tau];
+        obj.Tau = diff(obj.TimeSpan);
+end 
 end % end taylorregtime
 
 % Revision History:

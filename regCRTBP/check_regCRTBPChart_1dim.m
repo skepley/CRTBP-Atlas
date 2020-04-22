@@ -1,4 +1,4 @@
-%CHECK_REGCRTBP - testing, validation, and debugging for RegCRTBPChart class for 0 dimensional initial data
+%CHECK_REGCRTBP - testing, validation, and debugging for RegCRTBPChart class for 1 dimensional initial data
 
 %   Author: Shane Kepley
 %   email: shane.kepley@rutgers.edu
@@ -12,12 +12,16 @@ addpath(genpath([computerPath,'Dropbox/Matlab/SeqDE']))
 addpath(genpath([computerPath, 'Dropbox/Regularisation3bp/CRTBP Atlas']))
 %% ================================================== MAKE SOME CHOICES ==================================================
 % Integrator parameters
+N = 10; % spatial truncation
 M = 25; % temporal truncation
-truncation = M; % set truncation as a single float
+truncation = [M, N]; % set truncation vector
+subDivideParameter = [4, .1, 4]; % default is [4, .1, 4]
 basis = 'Taylor';
 mu = .25; % small mass primary
 isValid = false;
-bdCheck = @(obj, boundaryChart, maxTau)boundarycheck(obj, boundaryChart, maxTau);
+hotSwap = false; % specify whether charts should swap based on the ideal domain map or not
+bdCheck = @(obj, boundaryChart, maxTau)boundarycheck(obj, boundaryChart, maxTau, 'SubDivideParameter', subDivideParameter,...
+    'HotSwap', hotSwap);
 odeOptions = odeset('RelTol',1e-13,'AbsTol',1e-13);
 
 % Integrator time stepping
@@ -25,34 +29,30 @@ initialTime = 0;
 tauGuess = 0.1; % initial timestep to scale each Taylor step
 maxTau = .3;
 tf = linspace(0, maxTau, 250); % plotting time points
-regType = 0;
+regType = 1;
 
 switch regType
     case 0  % =============== CHECK f_0 AGAINST RUNGE KUTTA ===============
         parameter = mu;
-        % set up some initial data at a point
+        % set up some initial data on a line
         p1 = [0.7104, 0.2973, 0.2554, 0.2068];
-        initialData = p1.';
-        % Integrate multiple timesteps
+        p2 = p1 + 1e-4*ones(size(p1));
+        initialData = cat(2, 0.5*[p1+p2; p2-p1]', zeros(4,N-2));
         bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess, 'boundary', true);
-        cht = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess);
-%         % Integrate multiple timesteps
-%         A0 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
-%         while ~isempty(A0.LeafStack)
-%             A0.growboundary()
-%         end
+        
+        % Integrate multiple timesteps
+        A0 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
+        while ~isempty(A0.LeafStack)
+            A0.growboundary()
+            %             A0.growboundary('RegTime', @(chart)chart.TimeSpan) % do not regularize time
+        end
         
         % plot orbits
         figure;
         hold on
-        s = 0;        
-        try
-            ob = cell2mat(cht.eval([s*ones(length(tf),1),linspace(0,1,length(tf))']));
-            disp('here')
-        catch
-            ob = mid(A0.orbit(s, tf));
-            disp('here2')
-        end
+        s = 0;
+        ob = mid(A0.orbit(s, tf));
+        
         
         plot3(ob(:,1), ob(:,3), ob(:,2), 'k', 'LineWidth',2)
         
@@ -88,7 +88,8 @@ switch regType
         maxTau = .3;
         A1 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
         while ~isempty(A1.LeafStack)
-            A1.growboundary()
+%             A1.growboundary()
+            A1.growboundary('RegTime', @(chart)chart.TimeSpan) % do not regularize time
         end
         
         % plot orbits
@@ -125,6 +126,7 @@ switch regType
         A2 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
         while ~isempty(A2.LeafStack)
             A2.growboundary()
+            %             A2.growboundary('RegTime', @(chart)chart.TimeSpan) % do not regularize time
         end
         
         % plot orbits
