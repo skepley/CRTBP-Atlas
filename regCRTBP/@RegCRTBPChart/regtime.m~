@@ -24,7 +24,12 @@ switch obj.RegType
         return
         
     otherwise % chart is in F1 or F2
-        initialCondition = obj.eval(zeros(1, obj.Dimension(1))) % get an initial point on the chart
+        if isequal(obj.Dimension(1), 1) % chart 
+            
+        else
+            
+        end
+        initialCondition = obj.eval([0,0]); % get an initial point on the chart
         F = @(t,x)rk45regvectorfield(t, x, obj.Parameter, obj.RegType);
         [tau, Fsol] = ode45(F, obj.TimeSpan, [initialCondition{:}]', odeset('AbsTol',1e-13));
         w = Fsol(:,1).^2 + Fsol(:,3).^2;

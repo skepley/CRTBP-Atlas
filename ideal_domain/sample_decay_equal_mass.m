@@ -50,20 +50,20 @@ S1Sample = S1Sample(1:end-1);
 P = @(xy, theta)cos(theta)*velocityRadius(xy);
 Q = @(xy, theta)sin(theta)*velocityRadius(xy);
 %% ================================================== COMPUTE F0 DECAY MAP ==================================================
-load F0decay_C3_equalmass
-load F1decay_C3_equalmass
+% load F0decay_C3_equalmass
+% load F1decay_C3_equalmass
 
-% regType = 0;
-% meandecaymap = @(x,y)mean(arrayfun(@(theta)scalardecaymap([x; P([x,y], theta); y; Q([x,y], theta)], M, parameter, regType), S1Sample));
-% F0DecayData = arrayfun(@(x,y)meandecaymap(x,y), X, Y); 
-% save('F0decay_C3_equalmass', 'F0DecayData');
-% 
-% %% ================================================== COMPUTE F1 DECAY MAP ==================================================
-% regType = 1;
-% parameter = [mu, C];
-% meandecaymap = @(x,y)mean(arrayfun(@(theta)scalardecaymap([x; P([x,y], theta); y; Q([x,y], theta)], M, parameter, regType), S1Sample));
-% F1DecayData = arrayfun(@(x,y)meandecaymap(x,y), X, Y); 
-% save('F1decay_C3_equalmass', 'F1DecayData');
+regType = 0;
+meandecaymap = @(x,y)mean(arrayfun(@(theta)scalardecaymap([x; P([x,y], theta); y; Q([x,y], theta)], M, parameter, regType), S1Sample));
+F0DecayData = arrayfun(@(x,y)meandecaymap(x,y), X, Y); 
+save('F0decay_C3_equalmass', 'F0DecayData');
+
+%% ================================================== COMPUTE F1 DECAY MAP ==================================================
+regType = 1;
+parameter = [mu, C];
+meandecaymap = @(x,y)mean(arrayfun(@(theta)scalardecaymap([x; P([x,y], theta); y; Q([x,y], theta)], M, parameter, regType), S1Sample));
+F1DecayData = arrayfun(@(x,y)meandecaymap(x,y), X, Y); 
+save('F1decay_C3_equalmass', 'F1DecayData');
 
 %% ================================================== FILL IN DATA VIA REFLECTIONS ==================================================
 Yr = [flipud(-Y(2:end,:));Y];
@@ -71,7 +71,7 @@ Xr = [X(2:end,:);X];
 F1r = [flipud(F1DecayData(2:end,:)); F1DecayData];
 F0r = [flipud(F0DecayData(2:end,:)); F0DecayData];
 F2r = fliplr(F1r);
-% return
+
 %% ================================================== GET VERTICES ALONG BREAKEVEN BOUNDARIES ==================================================
 
 Z1 = F1r - F0r;

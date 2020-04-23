@@ -52,17 +52,18 @@ p1 = [0.7104, 0.2973, 0.2554, 0.2068];
 initialData = p1.';
 % Integrate multiple timesteps
 ob = RegCRTBPChart(initialData, basis, initialTime, M, parameter, regType, 'InitialScaling', tauGuess);
+ob.rescaletime(eps(1));
 
-return
-% apply Taylor regtime
-tauChart = A1.Chart(1).deepcopy();
-tauChart.taylorregtime()
 
 % apply ode45 regtime algorithm
-tChart = A1.Chart(1).deepcopy();
+tChart = ob.deepcopy();
 tChart.regtime()
-disp(tauChart.Tau - tChart.Tau)
 
+% apply Taylor regtime
+tauChart = ob.deepcopy();
+tauChart.taylorregtime()
+
+disp(tauChart.Tau - tChart.Tau)
 return
 %% ============================ 1-DIMENSIONAL DATA, FORWARD TIME ============================
 % Integrator time stepping

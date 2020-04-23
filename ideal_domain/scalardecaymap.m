@@ -2,9 +2,9 @@ function decayEstimate = scalardecaymap(x, M, parameter, regType)
 %SCALARDECAYMAP - Evaluates the Taylor coefficient decay map for a 0-dimensional IVP
 %
 %   Syntax:
-%       decayEstimate = SCALARDECAYMAP(x, M, parameter, regType) returns an estimate of the rescaling which makes the 
-%           last Taylor coefficient have magnitude on order of eps(1). 
-%    
+%       decayEstimate = SCALARDECAYMAP(x, M, parameter, regType) returns an estimate of the rescaling which makes the
+%           last Taylor coefficient have magnitude on order of eps(1).
+%
 %   Inputs:
 %       x - Initial Data
 %       input2 - Description
@@ -24,16 +24,16 @@ function decayEstimate = scalardecaymap(x, M, parameter, regType)
 %   Date: 20-Feb-2020; Last revision: 9-Mar-2020
 
 if isequal(regType, 0)
-    orbit = RegCRTBPChart(x, 'Taylor', 0, M, parameter, regType);
-    orbit.rescaletime(eps(1));
+    orbitSegment = RegCRTBPChart(x, 'Taylor', 0, M, parameter, regType);
+    orbitSegment.rescaletime(eps(1));
 else
     x1Full = CRTBP2reg(reshape(x, [], 4), parameter(1), regType);
     x1 = reshape(x1Full(1:4), [], 1);
-    orbit = RegCRTBPChart(x1, 'Taylor', 0, M, parameter, regType);
-    orbit.rescaletime(eps(1));
-    regtime(orbit);
+    orbitSegment = RegCRTBPChart(x1, 'Taylor', 0, M, parameter, regType);
+    orbitSegment.rescaletime(eps(1));
+    taylorregtime(orbitSegment);
 end
-decayEstimate = orbit.Tau;
+decayEstimate = orbitSegment.Tau;
 end % end scalardecaymap
 
 % Revision History:
