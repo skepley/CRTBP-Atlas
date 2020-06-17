@@ -1,12 +1,12 @@
-function [output1,output2] = equalmassidealdomain(input1,input2,input3,varargin)
-%EQUALMASSIDEALDOMAIN - One line description of what the function or script performs (H1 line)
+function bestCoordinate = equalmassidealdomain(u, regType)
+%EQUALMASSIDEALDOMAIN - Return the ideal domain for a CRTBP position with respect to equal mass parameters.
 %
 %   EQUALMASSIDEALDOMAIN() - A more detailed description of the function
 %
 %   Syntax:
 %       output = EQUALMASSIDEALDOMAIN(input1, input2)
 %       [output1, output2] = EQUALMASSIDEALDOMAIN(input1, input2, input3)
-%    
+%
 %   Inputs:
 %       input1 - Description
 %       input2 - Description
@@ -23,25 +23,31 @@ function [output1,output2] = equalmassidealdomain(input1,input2,input3,varargin)
 
 %   Author: Shane Kepley
 %   email: shane.kepley@rutgers.edu
-%   Date: 17-Apr-2020; Last revision: 17-Apr-2020
+%   Date: 17-Apr-2020; Last revision: 15-Jun-2020
 
-%% parse input 
-% p = inputParser;
-% addRequired(p, 'input1')
-% addRequired(p, 'input2')
-% addRequired(p, 'input3')
-% addParameter(p, 'Parameter1', default1)
-% addParameter(p, 'Parameter2', default2)
-% addParameter(p, 'Parameter3', default3)
-% 
-% parse(p,input1,input2,input3,varargin{:})
-% parameter1 = p.Results.Parameter1;
-% parameter2 = p.Results.Parameter2;
-% parameter3 = p.Results.Parameter3;
-
-
-load ideal_domain_boundary_C3_equalmass
 mu = 1/2;
+switch regType
+    case 0
+        if u(1) < 0
+            bestCoordinate = 1;
+        else
+            bestCoordinate = 2;
+        end
+        
+    case 1
+        if 2*u(1).^2 > -mu + sqrt(mu^2 + 4*u(1).^2.*u(2).^2)  % returns true if point is inside the f2 ideal strip
+            bestCoordinate = 2;
+        else
+            bestCoordinate = 1;
+        end
+        
+    case 2
+        if 2*u(1).^2 < 1 - mu + sqrt((1-mu)^2 + 4*u(1).^2.*u(2).^2)  % returns true if point is inside the f1 ideal strip
+            bestCoordinate = 1;
+        else
+            bestCoordinate = 2;
+        end
+end
 
 
 end % end equalmassidealdomain

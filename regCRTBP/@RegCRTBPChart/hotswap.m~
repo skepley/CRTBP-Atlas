@@ -41,9 +41,10 @@ if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original functio
             p0 = obj.Coordinate(2);
             y0 = obj.Coordinate(3);
             q0 = obj.Coordinate(4);
-            %             C = CRTBPenergy([x0.Coefficient(1), p0.Coefficient(1), y0.Coefficient(1), q0.Coefficient(1)]', mu, 0);
+%             C = CRTBPenergy([x0.Coefficient(1), p0.Coefficient(1), y0.Coefficient(1), q0.Coefficient(1)]', mu, 0);
             C = meanenergy(obj);  % compute mean anergy evaluated over 100 uniformly spaced nodes.
 
+         
             % map to regularized coordinates
             z = x0 + y0*1i;
             w = sqrt(z - mu);
@@ -80,7 +81,7 @@ if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original functio
             p0 = obj.Coordinate(2);
             y0 = obj.Coordinate(3);
             q0 = obj.Coordinate(4);
-            %             C = CRTBPenergy([x0.Coefficient(1), p0.Coefficient(1), y0.Coefficient(1), q0.Coefficient(1)]', mu, 0); % compute energy of regularization at center of boundary arc
+%             C = CRTBPenergy([x0.Coefficient(1), p0.Coefficient(1), y0.Coefficient(1), q0.Coefficient(1)]', mu, 0); % compute energy of regularization at center of boundary arc
             C = meanenergy(obj);  % compute mean anergy evaluated over 100 uniformly spaced nodes.
             
             % map to regularized coordinates
@@ -125,7 +126,7 @@ else  % updated version of the code includes swapping between regularized coordi
             p1 = obj.Coordinate(2);
             y1 = obj.Coordinate(3);
             q1 = obj.Coordinate(4);
-            C = obj.Parameter(2);
+            C = obj.parameter(2);
             
             % compute w and z
             xx = x1*x1;
@@ -159,7 +160,7 @@ else  % updated version of the code includes swapping between regularized coordi
             p2 = obj.Coordinate(2);
             y2 = obj.Coordinate(3);
             q2 = obj.Coordinate(4);
-            C = obj.Parameter(2);
+            C = obj.parameter(2);
             
             
             % compute w and z
@@ -183,8 +184,8 @@ else  % updated version of the code includes swapping between regularized coordi
             q0Term = yp_xq*invk1;  %(y2p2 + x2q2)/(x2^2 + y2^2)
             
             % use previous computations x1,y1, and products/sums to compute p1,q1
-            p1 = p0Term*x1 + q0Term*y1;
-            q1 = q0Term*x1 - p0Term*y1;
+            p2 = p0Term*x1 + q0Term*y1;
+            q2 = q0Term*x1 - p0Term*y1;
             newID = [x1.Coefficient; p1.Coefficient; y1.Coefficient; q1.Coefficient];
             newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
             
@@ -205,8 +206,8 @@ function meanEnergy = meanenergy(chart)
 %MEANENERGY - compute the Mean energy along an F0 boundary chart discretzied at 100 uniform points
 
 s = linspace(-1,1,100).';
-chartEval = cell2mat(chart.eval(s));
-energy = CRTBPenergy(chartEval(:, 1:4), chart.Parameter, chart.RegType);
+chartEval = cell2mat(obj.eval(s));
+energy = CRTBPenergy(chartEval(:, 1:4), obj.Parameter, obj.RegType);
 meanEnergy = mean(energy);
 end
 

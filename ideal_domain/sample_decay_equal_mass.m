@@ -35,35 +35,46 @@ parameter = mu;
 r1 = @(u)sqrt((u(1) - mu).^2 + u(3).^2);
 r2 = @(u)sqrt((u(1) + 1 - mu).^2 + u(3).^2);
 U = @(xy)mu*(0.5*r2([xy(1), 0, xy(2), 0]).^2 + 1./r2([xy(1), 0, xy(2), 0])) + (1-mu)*(0.5*r1([xy(1), 0, xy(2), 0]).^2 + 1./r1([xy(1), 0, xy(2), 0])); % F0 potential
-sampleDomain = [-1, 1, 0, 1.3];
-dx = 2/99;  % grid width to sample on
-sampleX = sampleDomain(1):dx:sampleDomain(2);
+sampleDomain = [-.8, .8, 0, .9];
+dx = 6/97;  % grid width to sample on
+leftX = sampleDomain(1):dx:0;  % left side sample points for X
+sampleX = [leftX, -leftX(end):dx:sampleDomain(2)+0.1*dx];  % enforce symmetric sampling w.r.t. the origin
 sampleY = sampleDomain(3):dx:sampleDomain(4);
 nSample = length(sampleX)*length(sampleY);
+fprintf('Number of configuration space sample pts: %d \n',nSample)
 [X, Y] = meshgrid(sampleX, sampleY);
 velocityRadius = @(xy)sqrt(2*U(xy) - C);
 
 % velocity sampling functions for averaging over the circle in velocity coodinates for a fixed energy.
-nVelocitySample = 5;  % number of samples to average over in velocity space
+nVelocitySample = 31;  % number of samples to average over in velocity space
 S1Sample = linspace(0,2*pi,nVelocitySample + 1);
 S1Sample = S1Sample(1:end-1);
 P = @(xy, theta)cos(theta)*velocityRadius(xy);
 Q = @(xy, theta)sin(theta)*velocityRadius(xy);
-%% ================================================== COMPUTE F0 DECAY MAP ==================================================
+
+% load equal mass decays
 % load F0decay_C3_equalmass
 % load F1decay_C3_equalmass
+load equalmass_decay_data
 
-regType = 0;
-meandecaymap = @(x,y)mean(arrayfun(@(theta)scalardecaymap([x; P([x,y], theta); y; Q([x,y], theta)], M, parameter, regType), S1Sample));
-F0DecayData = arrayfun(@(x,y)meandecaymap(x,y), X, Y); 
-save('F0decay_C3_equalmass', 'F0DecayData');
 
-%% ================================================== COMPUTE F1 DECAY MAP ==================================================
-regType = 1;
-parameter = [mu, C];
-meandecaymap = @(x,y)mean(arrayfun(@(theta)scalardecaymap([x; P([x,y], theta); y; Q([x,y], theta)], M, parameter, regType), S1Sample));
-F1DecayData = arrayfun(@(x,y)meandecaymap(x,y), X, Y); 
-save('F1decay_C3_equalmass', 'F1DecayData');
+% %% ================================================== COMPUTE F0 DECAY MAP ==================================================
+% % or compute equal mass decays: 
+% regType = 0;
+% meandecaymap = @(x,y)mean(arrayfun(@(theta)scalardecaymap([x; P([x,y], theta); y; Q([x,y], theta)], M, parameter, regType), S1Sample));
+% F0DecayData = arrayfun(@(x,y)meandecaymap(x,y), X, Y); 
+% % save('F0decay_C3_equalmass', 'F0DecayData');
+% 
+% %% ================================================== COMPUTE F1 DECAY MAP ==================================================
+% fprintf('Now computing F1 decay \n')
+% regType = 1;
+% parameter = [mu, C];
+% meandecaymap = @(x,y)mean(arrayfun(@(theta)scalardecaymap([x; P([x,y], theta); y; Q([x,y], theta)], M, parameter, regType), S1Sample));
+% F1DecayData = arrayfun(@(x,y)meandecaymap(x,y), X, Y); 
+% % save('F1decay_C3_equalmass', 'F1DecayData');
+% save('equalmass_decay_data')
+% jobsdone
+% return
 
 %% ================================================== FILL IN DATA VIA REFLECTIONS ==================================================
 Yr = [flipud(-Y(2:end,:));Y];
@@ -72,22 +83,64 @@ F1r = [flipud(F1DecayData(2:end,:)); F1DecayData];
 F0r = [flipud(F0DecayData(2:end,:)); F0DecayData];
 F2r = fliplr(F1r);
 
-%% ================================================== GET VERTICES ALONG BREAKEVEN BOUNDARIES ==================================================
-
+% ================================================== GET VERTICES ALONG BREAKEVEN BOUNDARIES ==================================================
 Z1 = F1r - F0r;
 Z2 = F2r - F0r;
-X = Xr;
-Y = Yr;
+Z3 = F1r - F2r;
+
+
+% downsample to get a single component
+sampleRate = 1;
+X = Xr(1:sampleRate :end, 1:sampleRate :end);
+Y = Yr(1:sampleRate :end, 1:sampleRate :end);
+Z1 = Z1(1:sampleRate :end, 1:sampleRate :end);
+Z2 = Z2(1:sampleRate :end, 1:sampleRate :end);
+Z3 = Z3(1:sampleRate :end, 1:sampleRate :end);
+
+
+threshold = 0;
+% plots
+close all
+figure
+hold on
+contourf(X,Y,Z1, 15)
+contour(X,Y,Z1,[threshold, threshold],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
+scatter([mu, mu-1], [0,0], 200, 'r', 'filled')  % plot primaries
+colorbar
+title('F1 - F0 decay')
+
+
+figure 
+hold on
+contourf(X,Y,Z2, 15)
+contour(X,Y,Z2,[threshold, threshold],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
+scatter([mu, mu-1], [0,0], 200, 'r', 'filled')  % plot primaries
+colorbar
+title('F2 - F0 decay')
+
+figure
+hold on
+contour(X,Y,Z2,[threshold, threshold],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
+contour(X,Y,Z1,[threshold, threshold],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
+
+
+% figure 
+% hold on
+% contourf(X,Y,Z3, 15)
+% zeroLevelSet = contour(X,Y,Z3,[0,0],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
+% scatter([mu, mu-1], [0,0], 200, 'r', 'filled')  % plot primaries
+% colorbar
+% title('F1 - F2 decay')
+
 
 % construct the boundary of P01 and P10 polygons
-zeroLevelSet = contour(X,Y,Z1,[0,0],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
-close(gcf)
 % initialize arrays of component polygons
+
 P01Boundary = cell(1); % f1-f0 boundary in f0-coordinates
 P10Boundary = cell(1); % f1-f0 boundary in f1-coordinates
 P21Boundary = cell(1); % f1-f0 boundary in f2-coordinates
-
 nComponent = 1;
+zeroLevelSet = contour(X,Y,Z1,[threshold, threshold],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
 while size(zeroLevelSet, 2) > 1
     componentIdx = zeroLevelSet(2,1) + 1;  % get final index of this component of zero level set
     P01Boundary{nComponent} = zeroLevelSet(:, 2:componentIdx);  % get vertices of this connected component of zero level set
@@ -112,9 +165,7 @@ while size(zeroLevelSet, 2) > 1
 end
 
 % construct the boundary of P02 and P20 polygons
-zeroLevelSet = contour(X,Y,Z2,[0,0],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
-close(gcf)
-
+zeroLevelSet = contour(X,Y,Z2,[threshold, threshold],'r', 'LineWidth', 3); % use contour map to interpolate zero level set
 % initialize arrays of component polygons
 P02Boundary = cell(1); % f2-f0 boundary in f0-coordinates
 P12Boundary = cell(1); % f2-f0 boundary in f1-coordinates
@@ -156,24 +207,39 @@ save('ideal_domain_boundary_C3_equalmass', 'P01Boundary', 'P10Boundary', 'P21Bou
 
 
 
-
 return
+
 %% ================================================== PLOT DECAY DIFFERENCE ==================================================
 
 % F10 CONTOUR LINES
-Z1 = F1r - F0r;
+Z1 = F1r - F0r; % plot difference of decay maps
+% Z1 = Z1./F1r; % relative difference
+% Z1 = F0r./F1r; % plot quotient of decay maps
+% Z1 = min(Z1, 2)
 X = Xr;
-Y = Yr;
- 
+Y = Yr; 
+
 close all
 figure
 hold on
+pcolor(X,Y,Z1)
 
+% % downsampled contours
+% figure
+% hold on
+% contourf(X(1:2:end, 1:2:end), Y(1:2:end, 1:2:end), Z1(1:2:end, 1:2:end))
+% contourf(X(1:2:end, 1:2:end), Y(1:2:end, 1:2:end), Z1(1:2:end, 1:2:end), [0,0],'r', 'LineWidth', 3);
+
+
+figure
+hold on
 % plot contour lines
-contourf(X,Y,Z1,25)
+contourf(X,Y,Z1, 25)
+zeroLevelSet = contour(X,Y,Z1,[0,0],'r', 'LineWidth', 3); % plot zero level set
+% oneLevelSet = contour(X, Y, Z1, [1,1], 'r', 'LineWidth', 3); % plot one level set
+colorbar
+return
 
-% plot zero level set
-zeroLevelSet = contour(X,Y,Z1,[0,0],'r', 'LineWidth', 3);
 component = cell(1);  % initialize array of component polygons
 nComponent = 1;
 while size(zeroLevelSet, 2) > 1
@@ -203,7 +269,7 @@ end
 dealfig()
 
 return
-% F20 CONTOUR LINES
+%% F20 CONTOUR LINES
 Z2 = F2r - F0r;
 figure
 hold on
