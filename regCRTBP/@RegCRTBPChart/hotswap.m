@@ -24,17 +24,19 @@ function newObj = hotswap(obj, swapTo)
 %   email: shane.kepley@rutgers.edu
 %   Date: 14-Apr-2019; Last revision: 17-Jun-2020
 
-disp('hotswapped')
-obj.TimeSpan
 mu = obj.Parameter(1);
 coordinateBasis = obj.Coordinate(1).Basis;
+
+if isequal(obj.RegType, swapTo)  % identity map
+    error('Tried to pass identity map to hotswap')
+end
 
 if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original function which mapped only between standard and regularized coordinates
     mapDirection = swapTo - obj.RegType; % Possible values are {0, 1, -1, 2, -2}
     switch mapDirection
-        case 0 % Do not change coordinates i.e. this is the identity map.
-            newObj = obj.deepcopy(); % Return a deep copy of the current boundary without changing any coordinates.
-            return
+%         case 0 % Do not change coordinates i.e. this is the identity map.
+%             newObj = obj.deepcopy(); % Return a deep copy of the current boundary without changing any coordinates.
+%             return
         case 1 % map from F0 (standard) to F1 (regularized) coordinates
             % unpack the old coordinates
             x0 = obj.Coordinate(1);
@@ -196,8 +198,6 @@ newObj.Generation = obj.Generation; % update the new chart to the correct genera
 newObj.ParentHandle = obj.ParentHandle; % update the new chart to the correct parent chart
 newObj.SpatialSpan = obj.SpatialSpan; % update the new chart to the correct spatial domain
 newObj.Crash = obj.Crash; % update the new chart to crash correctly
-
-
 end % end hotswap
 
 

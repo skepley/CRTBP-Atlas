@@ -48,8 +48,6 @@ switch regType
             bestCoordinate = 2;
         end
 end
-
-
 end % end equalmassidealdomain
 
 % Revision History:

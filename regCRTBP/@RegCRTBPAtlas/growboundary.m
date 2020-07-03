@@ -37,6 +37,7 @@ regtime = p.Results.RegTime;
 
 boundarycheck = obj.BoundaryCheck; % inherit boundarychecker
 advectioncheck = obj.AdvectionCheck; % inherit advection checker
+idealdomaincheck = obj.IdealDomainCheck; % inherit ideal domain checker
 boundaryStack = obj.LeafStack; % initialize boundary chart stack
 advectionStack = obj.ChartClass; % initialize advection stack
 advectionStack = advectionStack(2:end); % empty the advection stack

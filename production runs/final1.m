@@ -11,7 +11,7 @@
 
 %   Author: Shane Kepley
 %   email: shane.kepley@rutgers.edu
-%   Date: 30-Dec-2019; Last revision: 30-Dec-2019
+%   Date: 30-Dec-2019; Last revision: 17-Jun-2020
 
 %% ================================================== SET DATA PATHS AND FILENAMES  ==================================================
 clear all
@@ -92,7 +92,7 @@ else % compute and save unstable manifold data
     
     % Integrate the unstable manifold forward in time.
     bdCheck = @(obj, boundaryChart, maxTau)boundarycheck(obj, boundaryChart, maxTau, 'SubDivideParameter', subDivideParameter);
-    atlasL4F = Atlas(unstableBd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
+    atlasL4F = RegCRTBPAtlas(unstableBd, tauGuess, bdCheck, @advectioncheck, @equalmassidealdomain, 'MaxTau', maxTau);
     while ~isempty(atlasL4F.LeafStack)
         fprintf('%0.4f \n', min([atlasL4F.LeafStack.TimeSpan]))
         atlasL4F.growboundary('RegTime', @regtime)
@@ -110,13 +110,15 @@ else % compute and save stable manifold data
     % Integrate the collision manifold for the large primary backwards in time.
     stableBd = RegCRTBPChart(initialData, 'Taylor', 0, truncation, [mu, C], 1, 'InitialScaling', -tauGuess, 'boundary', true);
     bdCheck = @(obj, boundaryChart, minTau)boundarycheck(obj, boundaryChart, minTau, 'SubDivideParameter', subDivideParameter);
-    atlasP1B = Atlas(stableBd, -tauGuess, bdCheck, @advectioncheck, 'MaxTau', minTau);
+    atlasP1B = RegCRTBPAtlas(stableBd, -tauGuess, bdCheck, @advectioncheck, @equalmassidealdomain, 'MaxTau', minTau);
     while ~isempty(atlasP1B.LeafStack)
         fprintf('%0.4f \n', min([atlasP1B.LeafStack.TimeSpan]))
         atlasP1B.growboundary('RegTime', @regtime)
     end
     save(stableFileID, 'stableBd', 'atlasP1B') % save manifold data
 end
+jobsdone
+return
 %% ================================================== MINE FOR INTERSECTIONS ==================================================
 if isfile(collisionFileID) % check if collisions have already been computed
     disp('Using existing collision data')

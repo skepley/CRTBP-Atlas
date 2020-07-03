@@ -42,7 +42,7 @@ addParameter(p, 'HotSwap', true) % by default the charts will automatically appl
 
 parse(p, obj, boundaryChart, maxTau, varargin{:})
 subDivideParameter = p.Results.SubDivideParameter;
-hotSwap = p.Results.HotSwap; 
+hotSwap = p.Results.HotSwap;
 
 % cell array of fitness check functions
 if hotSwap
@@ -75,7 +75,7 @@ if crashNow
         parentChart.scaletime(newTau); % rescale parentChart to newTau timestep.
         % 5 July 2019 - newTau updated to have the same sign as obj.Tau so time orientation is preserved correctly.
     else
-        disp('maximum generation reached')
+        disp('maximum generation reached') 
     end
     
     boundaryChart.Crash = true;
@@ -112,77 +112,34 @@ end % end boundarycheck
 % end % crashnow
 
 function newBd = rule1(obj, bdChart, subDivideParameter)
-%RULE1 - Swap coordinates if this chart crosses its ideal boundary with respect to its regularization type
+%RULE1 - hotswaps to ideal coordinates based on the Atlas.IdealDomainCheck map
 
 if ismember('Chebyshev', bdChart.Basis) % regularized coordinates for Chebyshev require sqrt implementation
     newBd = bdChart;
     return
 end
 
-switch bdChart.RegType
-    case 0 % check if boundary should change to F1 or F2 coordinates
-        x0 = bdChart.Coordinate(1);
-        y0 = bdChart.Coordinate(3);
-        nGridNode = 20;
-        evalGrid = linspace(-1,1,nGridNode);
-        X0 = mid(x0.eval(evalGrid)); % evaluate at the nodes
-        Y0 = mid(y0.eval(evalGrid));
-        
-        mu = bdChart.Parameter(1);
-        S1Check = (X0 - mu).^2 + Y0.^2;
-        S2Check = (X0 - mu + 1).^2 + Y0.^2;
-        
-        % check both ideal domains
-        idealRadiusSquare = 1/16;
-        if sum(S1Check < idealRadiusSquare) > 0.5*nGridNode % too much of the arc lies in the ideal domain for F1
-            newBd = bdChart.hotswap(1); % swap from F0 to F1 coordinates
-            newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
-
-        elseif sum(S2Check < idealRadiusSquare) > 0.5*nGridNode % too much of the arc lies in the ideal domain for F2
-            newBd = bdChart.hotswap(2); % swap from F0 to F2 coordinates
-            newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
-
-        else % stay in F0 coordinates
-            newBd = bdChart;
-        end
-        
-    case 1 % check if boundary should change to F0 coordinates
-        idealRadiusSquare = 1/4;
-        x1 = bdChart.Coordinate(1);
-        y1 = bdChart.Coordinate(3);
-        nGridNode = 20;
-        evalGrid = linspace(-1,1,nGridNode);
-        squareRadius = mid(x1.eval(evalGrid).^2 + y1.eval(evalGrid).^2);
-        if sum(squareRadius > idealRadiusSquare) > 0.5*nGridNode % more than half of the arc lies outside the ideal domain
-            newBd = bdChart.hotswap(0); % swap from F1 to F0 coordinates
-            newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
-        else % stay in F1 coordinates
-            newBd = bdChart;
-        end
-        
-    case 2 % check if boundary should change to F0 coordinates
-        idealRadiusSquare = 1/4;
-        x2 = bdChart.Coordinate(1);
-        y2 = bdChart.Coordinate(3);
-        nGridNode = 20;
-        evalGrid = linspace(-1,1,nGridNode);
-        squareRadius = mid(x2.eval(evalGrid).^2 + y2.eval(evalGrid).^2);
-        if sum(squareRadius > idealRadiusSquare) > 0.5*nGridNode % more than half of the arc lies outside the ideal domain
-            newBd = bdChart.hotswap(0); % swap from F2 to F0 coordinates
-            newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
-        else % stay in F2 coordinates
-            newBd = bdChart;
-        end
+x = bdChart.Coordinate(1);
+y = bdChart.Coordinate(3);
+nGridNode = 20;
+evalGrid = linspace(-1,1,nGridNode);
+X = mid(x.eval(evalGrid)); % evaluate at the nodes
+Y = mid(y.eval(evalGrid));
+positionData = [X; Y];
+idealDomain = arrayfun(@(idx)obj.IdealDomainCheck(positionData(:, idx), bdChart.RegType), 1:nGridNode);
+swapTo = mode(idealDomain);
+if isequal(swapTo, bdChart.RegType)  % this chart is already in the ideal coordinates
+    newBd = bdChart;
+else
+    newBd = bdChart.hotswap(swapTo); % swap to ideal coordinates
+    newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
 end
-end % rule1
+end
 
 function newBd = rule2(obj, bdChart, subDivideParameter)
 %RULE2 - Subdivides into smaller charts if the tailratio grows too large
 
-if ismember('Chebyshev', bdChart.Basis) % regularized coordinates for Chebyshev require sqrt implementation
-    newBd = bdChart;
-    return
-end
+
 
 % unpack subdivision parameters
 tailStartsAt = subDivideParameter(1); % The first coefficient which is considered part of the tail
@@ -195,7 +152,7 @@ if max(tailRatio(~isnan(tailRatio))) > maxTailRatio
     endPts = linspace(-1,1,1 + nSubChart)';
     parmRange = [endPts(1:end-1),endPts(2:end)];
     newBd = bdChart.subdivide(parmRange);
-    fprintf('subdivided \n')
+    fprintf('subdivided with tailratio = %0.4f \n', max(tailRatio(~isnan(tailRatio))))
 else
     newBd = bdChart;
 end
@@ -211,7 +168,7 @@ function newBd = swapcondition(oldBd, newBd, subDivideParameter)
 tailStartsAt = subDivideParameter(1); % The first coefficient which is considered part of the tail
 maxTailRatio = subDivideParameter(2); % Threshold value for allowable tailratio
 nSubChart = subDivideParameter(3); % Number of charts to subivide into
-tailRatio = newBd.Coordinate.tailratio(tailStartsAt); 
+tailRatio = newBd.Coordinate.tailratio(tailStartsAt);
 if max(tailRatio(~isnan(tailRatio))) > maxTailRatio % check tailratio in new coordinates
     endPts = linspace(-1,1,1 + nSubChart)';
     parmRange = [endPts(1:end-1),endPts(2:end)];
@@ -220,7 +177,77 @@ if max(tailRatio(~isnan(tailRatio))) > maxTailRatio % check tailratio in new coo
 end
 end
 
-% %% OLD CODE SNIPPET FOR PRUNING ARCS
+
+
+%  ====================================== OLD VERSION OF RULE 1 WITH IDEAL DOMAINS AS DISCS  ======================================
+% function newBd = rule1(obj, bdChart, subDivideParameter)
+% %RULE1 - Swap coordinates if this chart crosses its ideal boundary with respect to its regularization type
+%
+% if ismember('Chebyshev', bdChart.Basis) % regularized coordinates for Chebyshev require sqrt implementation
+%     newBd = bdChart;
+%     return
+% end
+%
+% switch bdChart.RegType
+%     case 0 % check if boundary should change to F1 or F2 coordinates
+%         x0 = bdChart.Coordinate(1);
+%         y0 = bdChart.Coordinate(3);
+%         nGridNode = 20;
+%         evalGrid = linspace(-1,1,nGridNode);
+%         X0 = mid(x0.eval(evalGrid)); % evaluate at the nodes
+%         Y0 = mid(y0.eval(evalGrid));
+%
+%         mu = bdChart.Parameter(1);
+%         S1Check = (X0 - mu).^2 + Y0.^2;
+%         S2Check = (X0 - mu + 1).^2 + Y0.^2;
+%
+%         % check both ideal domains
+%         idealRadiusSquare = 1/16;
+%         if sum(S1Check < idealRadiusSquare) > 0.5*nGridNode % too much of the arc lies in the ideal domain for F1
+%             newBd = bdChart.hotswap(1); % swap from F0 to F1 coordinates
+%             newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
+%
+%         elseif sum(S2Check < idealRadiusSquare) > 0.5*nGridNode % too much of the arc lies in the ideal domain for F2
+%             newBd = bdChart.hotswap(2); % swap from F0 to F2 coordinates
+%             newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
+%
+%         else % stay in F0 coordinates
+%             newBd = bdChart;
+%         end
+%
+%     case 1 % check if boundary should change to F0 coordinates
+%         idealRadiusSquare = 1/4;
+%         x1 = bdChart.Coordinate(1);
+%         y1 = bdChart.Coordinate(3);
+%         nGridNode = 20;
+%         evalGrid = linspace(-1,1,nGridNode);
+%         squareRadius = mid(x1.eval(evalGrid).^2 + y1.eval(evalGrid).^2);
+%         if sum(squareRadius > idealRadiusSquare) > 0.5*nGridNode % more than half of the arc lies outside the ideal domain
+%             newBd = bdChart.hotswap(0); % swap from F1 to F0 coordinates
+%             newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
+%         else % stay in F1 coordinates
+%             newBd = bdChart;
+%         end
+%
+%     case 2 % check if boundary should change to F0 coordinates
+%         idealRadiusSquare = 1/4;
+%         x2 = bdChart.Coordinate(1);
+%         y2 = bdChart.Coordinate(3);
+%         nGridNode = 20;
+%         evalGrid = linspace(-1,1,nGridNode);
+%         squareRadius = mid(x2.eval(evalGrid).^2 + y2.eval(evalGrid).^2);
+%         if sum(squareRadius > idealRadiusSquare) > 0.5*nGridNode % more than half of the arc lies outside the ideal domain
+%             newBd = bdChart.hotswap(0); % swap from F2 to F0 coordinates
+%             newBd = swapcondition(bdChart, newBd, subDivideParameter); % check swap conditioning
+%         else % stay in F2 coordinates
+%             newBd = bdChart;
+%         end
+% end
+% end % rule1
+
+
+
+% %% ======================================   OLD CODE SNIPPET FOR PRUNING ARCS   ======================================
 % maxSquareRadius = 0.25;
 % u = bdChart.Coordinate(1);
 % v = bdChart.Coordinate(3);

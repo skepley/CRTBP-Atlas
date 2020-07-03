@@ -19,12 +19,13 @@ function regtime(obj)
 %   Date: 21-May-2019; Last revision: 21-May-2019
 
 %% parse input
+% warning('regtime should not be called except to verify taylorregtime')
 switch obj.RegType
     case 0 % chart is already in F0 coordinates
         return
         
     otherwise % chart is in F1 or F2
-        initialCondition = obj.eval(zeros(1, obj.Dimension(1))) % get an initial point on the chart
+        initialCondition = obj.eval(zeros(1, obj.Dimension(1))); % get an initial point on the chart
         F = @(t,x)rk45regvectorfield(t, x, obj.Parameter, obj.RegType);
         [tau, Fsol] = ode45(F, obj.TimeSpan, [initialCondition{:}]', odeset('AbsTol',1e-13));
         w = Fsol(:,1).^2 + Fsol(:,3).^2;

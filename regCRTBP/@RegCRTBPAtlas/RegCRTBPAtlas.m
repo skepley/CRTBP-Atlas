@@ -36,6 +36,8 @@ classdef RegCRTBPAtlas < Atlas
     
     %% -------------------- Properties --------------------
     properties
+        IdealDomainCheck  % a map into {0,1,2} which determines the best coordinates for a point in phase space
+        
         % ========== Inherited properties from Atlas class ==========
         %         Chart; % a tree of Chart objects ordered linearly
         %         Size=0; % number of Charts in the RegCRTBPAtlas
@@ -61,7 +63,7 @@ classdef RegCRTBPAtlas < Atlas
     
     %% -------------------- Methods --------------------
     methods
-        function obj = RegCRTBPAtlas(boundaryChart, tau, boundarycheck, advectioncheck, varargin)
+        function obj = RegCRTBPAtlas(boundaryChart, tau, boundarycheck, advectioncheck, idealdomaincheck, varargin)
             %REGCRTBPATLAS - class constructor
             
             if nargin > 0
@@ -73,11 +75,12 @@ classdef RegCRTBPAtlas < Atlas
                 addRequired(p,'tau')
                 addRequired(p,'boundarycheck') % 1-by-1 double
                 addRequired(p,'advectioncheck') % 1-by-(1+d) integer
+                addRequired(p,'idealdomaincheck') % function handle
                 addParameter(p,'MaxTau', Inf) % scalar double
                 addParameter(p,'MaxGeneration', Inf) % logical
                 
                 % parse variable arguments
-                parse(p, boundaryChart, tau, boundarycheck, advectioncheck, varargin{:})
+                parse(p, boundaryChart, tau, boundarycheck, advectioncheck, idealdomaincheck, varargin{:})
                 boundaryChart = p.Results.boundaryChart;
                 tau = p.Results.tau;
                 obj.MaxTau = p.Results.MaxTau;
@@ -89,6 +92,7 @@ classdef RegCRTBPAtlas < Atlas
                 obj.CrashStack = obj.CrashStack(2:end); % empty the stack
                 obj.BoundaryCheck = p.Results.boundarycheck;
                 obj.AdvectionCheck = p.Results.advectioncheck;
+                obj.IdealDomainCheck = p.Results.idealdomaincheck;
             end % end if nargin
         end % end class constructor
     end % end methods
