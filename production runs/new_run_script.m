@@ -4,20 +4,21 @@ function [output1,output2] = new_run_script(templateFilename, saveAsFilename, mu
 % NEW_RUN_SCRIPT() - A more detailed description of the function
 
 % Syntax:
-% output = NEW_RUN_SCRIPT(input1, input2)
-% [output1, output2] = NEW_RUN_SCRIPT(input1, input2, input3)
+% NEW_RUN_SCRIPT(templateFilename, saveAsFilename, mu, energy, time, source, target) generates a script in the same folder
+% named "saveAsFilename". Running this script will compute the stable/unstable manifolds associated with the target/source
+% respectively at the given mass and energy value and then try to mine these atlases for intersections. 
 % 
 % Inputs:
-% input1 - Description
-% input2 - Description
-% input3 - Description
-% 
-% Outputs:
-% output1 - Description
-% output2 - Description
+% templateFilname - a plain text file containing the path information for the computer which will run the script created
+% saveAsFilename - A string specifying the name which the new script should be called.
+% mu - The mass ratio of the small primary
+% energy - The energy level to search in for connections. If either the source or target is L4 then this must be the same as the L4 energy. 
+% time - [t-, t+] specifying the integration time for the stable and unstable maniflds respectively.
+% source - A string identifying the unstable object for the connection. This should be either 'P1', 'P2', or 'filename_where_L4_local_data_is_saved'
+% target - A string identifying the stable object for the connection. This should be either 'P1', 'P2', or 'filename_where_L4_local_data_is_saved'
 %
 %   Subfunctions: none
-%   Classes required: none
+%   Classes required: IMP library, RegCRTBPAtlas, RegCRTBPChart
 %   Other m-files required: none
 %   MAT-files required: none
 
@@ -25,15 +26,10 @@ function [output1,output2] = new_run_script(templateFilename, saveAsFilename, mu
 %   email: s.kepley@vu.nl
 %   Date: 30-May-2022;
 
-% INPUT
-% saveAsFilename = 'test_script';
+% unpack backward/forward integration times for stable/unstable manifolds
 timeBackward = time(1);
 timeForward = time(2);
 
-% mu = 0.5;
-% energy = 3;
-% source = 'L4';
-% target = 'P1';
 if ~any(strcmp(source, {'P1', 'P2'}))
     unstableLocalDataFrom = ['''', source, ''''];
     source = 'L4';
