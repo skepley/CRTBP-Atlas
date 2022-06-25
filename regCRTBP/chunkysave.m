@@ -34,7 +34,7 @@ atlasSize = scalarSize*atlas.Size*1e-9;  % estimated size of the atlas (in gigab
 nChunk = ceil(atlasSize);  % number of 1 GB chunks to chop the atlas in to
 
 if nChunk == 1  % atlas is less than 1GB. Just use the regular MATLAB save command
-    save([savePath, saveName], 'atlas')
+    save([savePath, saveName, '.mat'], 'atlas')
     
 else
     

@@ -13,6 +13,7 @@ For simplicity the code can be run with only a few steps.
 18 %   email: EMAIL
 ```
 * In your new template edit the following code block with the path to your local copy of the IMP library, the CRTBP Atlas repo, and the path where you would like the code to save your data. The atlases are often 10GB or more so I suggest you do not save to Dropbox or iCloud, etc. 
+
 ```
 27 addpath(genpath('PATH/TO/IMP/LIBRARY')) % this should point to the base folder named "IMP"
 28 addpath(genpath('PATH/TO/CRTBP ATLAS'))  % this should point to the base folder named "CRTBP Atlas"
@@ -20,7 +21,7 @@ For simplicity the code can be run with only a few steps.
 30 savePath = 'PATH/TO/SAVE/DATA/';  
 ```
 
-Save and close the new tempa
+Save and close the new template
 
 * Run the MATLAB function */CRTBP Atlas/production runs/new\_run\_script.m. The first argument is the name of the template created above. The second is the desired name for the script which will execute the connection search. The remaining choices are related to parameters for the CRTBP. Example code
 

@@ -77,7 +77,7 @@ if exist([savePath, stableFileID]) || exist([savePath, stableFileID, '.mat']) % 
 
 else % compute and save stable manifold data
     disp('Computing new stable manifold data')
-    [stableBd, stableLocalMap] = local_stable_boundary(mu, C, $UNSTABLELOCALDATAFROM, $STABLELOCALDATAFROM, truncation, -tauGuess);
+    [stableBd, stableLocalMap] = local_stable_boundary(mu, C, $STABLELOCALDATAFROM, truncation, -tauGuess);
 
 % Integrate the stable manifold backward in time.
     bdCheck = @(obj, boundaryChart, minTau)boundarycheck(obj, boundaryChart, minTau, 'SubDivideParameter', subDivideParameter);
