@@ -1,5 +1,5 @@
 # CRTBP Atlas
-MATLAB companion codes for globally searching for connecting orbits in the Circular Restricted Three Body Problem (CRTBP). This is companion code which includes Atlas and Chart classes which inherit from the base classes in the [IMP library](https://github.com/skepley/IMP). The atlases and mining algorithms are both adapted to dynamically perform Levi-Cevita regularization during the analytic continuation of the manifolds. 
+MATLAB companion codes for globally searching for connecting orbits in the Circular Restricted Three Body Problem (CRTBP). This is companion code which includes Atlas and Chart classes which inherit from the base classes in the [IMP library](https://github.com/skepley/IMP). The atlases and mining algorithms are both adapted to dynamically perform Levi-Civita regularization during the analytic continuation of the manifolds. 
 
 ## Searching for connections
 For simplicity the code can be run with only a few steps. 
