@@ -1,4 +1,4 @@
-function plot_connection(connectionStruct)
+function plot_connection(connectionStruct, mu)
 %PLOT_CONNECTION - Accepts a connection data structure (output by connection2BVP) and adds a plot of this connection in the configuration space of the current figure.
 %
 %   Syntax:
