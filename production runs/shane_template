@@ -1,0 +1,103 @@
+%$NAME - Production run for connections between $SOURCE and $TARGET
+%
+%   $NAME() - Compute atlases for the unstable manifold of $SOURCE, the stable manifold of $TARGET, and mine for 
+%           connecting orbits with the following parameters: 
+%
+%       Mass parameter: $MU
+%       Energy: $ENERGY
+%       Source: $SOURCE
+%       Target: $TARGET
+%       Time: $TIME1, +$TIME2
+%
+%   Subfunctions: none
+%   Classes required: IMP library, RegCRTBPAtlas, RegCRTBPChart
+%   Other m-files required: none
+%   MAT-files required: local manifold data file for L4 (if necessary)
+
+%   Author: 
+%   email: EMAIL
+%   Date: $date;
+
+clear vars
+close all
+clc
+
+%% ==================================== Set data path, parameters, and filenames ====================================
+% set paths for accessing and saving data
+computerPath = pcpath('mac');
+addpath(genpath([computerPath,'Dropbox/Matlab/IMP']))
+addpath(genpath([computerPath, 'Dropbox/Regularisation3bp/CRTBP Atlas']))
+savePath = [computerPath, 'Desktop/CRTBP_collision_manifolds/'];
+
+% ==================================== Analytic continuation parameters  ====================================
+mu = 0.5; % mass ratio of small primary
+C = 3; % Energy level set in which to search for connections
+minTau = $TIME1; % stable manifold integration time
+maxTau = $TIME2; % unstable manfiold integration time
+N = 21; % spatial truncation
+M = 40; % temporal truncation 
+truncation = [M, N]; % set truncation vector
+
+% ==================================== Parameters to leave alone for the most part ====================================
+regTime = @taylorregtime;  % set method of integration for regularizing time
+subDivideParameter = [4, .1, 4]; % default is [4, .1, 4]
+tauGuess = 0.1; % initial timestep to scale each Taylor step
+
+% ==================================== Set filenames ====================================
+% set file names to save manifold and collision data
+runID = sprintf('%.2f_%.2f_%d%d_default', mu, C, M, N); % Set a filename prefix for manifold/connection filenames. This should uniquely
+% identify the data for this run. The syntax used here is mass_energy_truncation_subdivisionparameters but you can use anything reasonable. 
+
+unstableFileID = ['$SOURCE_unstable_',sprintf('%.2f_', maxTau), runID]; % file or folder suffix for unstable manifold atlas data
+stableFileID = ['$TARGET_stable_',sprintf('%.2f_', minTau), runID]; % file or folder name suffix for stable manifold atlas data
+collisionFileID = [savePath, '$SOURCE_$TARGET_connections_',sprintf('%.2f_', maxTau - minTau), runID, '.mat']; % filename suffix for collision data
+
+%% ==================================== unstable manifold parameterizations ====================================
+if exist([savePath, unstableFileID]) || exist([savePath, unstableFileID, '.mat']) % check if unstable manifold is computed already
+    disp('Using existing unstable manifold data')
+    unstableAtlas = chunkyload(savePath, unstableFileID);
+
+else % compute and save unstable manifold data
+    disp('Computing new unstable manifold data')
+    [unstableBd, unstableLocalMap] = local_unstable_boundary(mu, C, $UNSTABLELOCALDATAFROM, $STABLELOCALDATAFROM, truncation, tauGuess);
+
+% Integrate the unstable manifold forward in time.
+    bdCheck = @(obj, boundaryChart, maxTau)boundarycheck(obj, boundaryChart, maxTau, 'SubDivideParameter', subDivideParameter);
+    unstableAtlas = RegCRTBPAtlas(unstableBd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
+    while ~isempty(unstableAtlas.LeafStack)
+        unstableAtlas.growboundary('RegTime', regTime)
+    end
+    chunkysave(unstableAtlas, savePath, unstableFileID) % save manifold data
+end
+
+%% ==================================== stable manifold parameterizations ====================================
+if exist([savePath, stableFileID]) || exist([savePath, stableFileID, '.mat']) % check if stable manifold is computed already
+    disp('Using existing stable manifold data')
+    stableAtlas = chunkyload(savePath, stableFileID);
+
+else % compute and save stable manifold data
+    disp('Computing new stable manifold data')
+    [stableBd, stableLocalMap] = local_stable_boundary(mu, C, $STABLELOCALDATAFROM, truncation, -tauGuess);
+
+% Integrate the stable manifold backward in time.
+    bdCheck = @(obj, boundaryChart, minTau)boundarycheck(obj, boundaryChart, minTau, 'SubDivideParameter', subDivideParameter);
+    stableAtlas = RegCRTBPAtlas(stableBd, -tauGuess, bdCheck, @advectioncheck, 'MaxTau', minTau);
+    while ~isempty(stableAtlas.LeafStack)
+        stableAtlas.growboundary('RegTime', regTime)
+    end
+    chunkysave(stableAtlas, savePath, stableFileID) % save manifold data
+end
+
+%% ====================================  mine for intersections ==================================== 
+if isfile(collisionFileID) % check if collisions have already been computed
+    disp('Using existing collision data')
+    load(collisionFileID)
+    
+else  % load stable/unstable manifolds and mine them
+    sols = mine_intersections(stableAtlas, unstableAtlas);
+    save(collisionFileID, 'sols') % save collision data
+end
+
+
+
+

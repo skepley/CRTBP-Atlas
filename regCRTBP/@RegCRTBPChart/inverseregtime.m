@@ -4,8 +4,8 @@ function regTau = inverseregtime(obj, F0Tau)
 %   INVERSEREGTIME() maps the time of flightn for an orbit segment w.r.t F0 time to the corresponding F1/F2 time of flight
 %
 %   Syntax:
-%       regTau = INVERSEREGTIME(RegCRTBPChart, F0Tau) returns the timestep in regularized time RegTau for this chart 
-%           given a specified timestep in F0 time. 
+%       regTau = INVERSEREGTIME(RegCRTBPChart, F0Tau) returns the timestep in regularized time RegTau for this chart
+%           given a specified timestep in F0 time.
 %
 %   Subfunctions: none
 %   Classes required: none
@@ -34,7 +34,11 @@ switch obj.RegType
         % Solve P(u) - F0Tau = 0
         initTau = obj.LocalTime*F0Tau/obj.Tau; % initial guess
         F = @(x)polyval(P, x);  % zero finding map
-        regTau = fzero(F, initTau);
+        try
+            regTau = fzero(F, initTau);
+        catch
+            sprintf('Inverse time fzero fail')
+        end
         %         dF = @(x)polyval(polyder(P), x);  % derivative of zero finding map
         %         regTau = findroot(F, dF, initTau);  % Newton's method to find solutions
         if isnan(regTau)

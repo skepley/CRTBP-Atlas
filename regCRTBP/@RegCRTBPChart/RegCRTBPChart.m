@@ -32,6 +32,7 @@ classdef RegCRTBPChart < Chart
     %   ToDo: 1. RegCRTBPChart/hotswap needs to inherit the initial error when coordinate swapping before this computation can be made rigorous. 
     
     properties
+        % ToDo: The localTime property is a confusing name. It should be renamed "RegTime" since LocalTime refers to Chart local time vs global (atlas) time. 
         RegType; % 0, 1, or 2 denotes a chart with respect to F0, F1, or F2.
         Parameter; % mu or [mu,C]
         LocalTime; % Keep track of the regularized local time so this information can be passed to the BVP solver.
