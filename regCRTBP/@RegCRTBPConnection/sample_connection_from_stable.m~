@@ -1,4 +1,4 @@
-function sData = sample_connection_from_stable(stableChart, globalUnstableCoords, globalStableCoords, globalTime)
+function sData = sample_connection_from_stable(obj.StableChart, globalUnstableCoords, globalStableCoords, globalTime)
 %SAMPLE_CONNECTION_FROM_STABLE - Given a candidate intersection for two charts, follow it backward through the chart lineage
 % (forward in time) to the local stable manifold. Evaluation is returned in separate strands for each RegType.
 %
@@ -11,7 +11,7 @@ function sData = sample_connection_from_stable(stableChart, globalUnstableCoords
 %
 %   Outputs:
 %       output1 - Description
-%       output2 - Description
+%       output2 - Description 
 %
 %   Subfunctions: none
 %   Classes required: none

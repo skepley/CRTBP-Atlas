@@ -7,36 +7,54 @@
 
 % first run final2.m
 load newl4_equalmass_local_manifolds % get local manifold data
-nNode = 1000;
+nNode = 100;
+
+j = 29;
+C = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
+cData = C.sample(100)
+% connections.plot(1000)
+
+% 
+% stableData = sample_connection_from_stable(obj.StableChart, obj.GlobalIntersection(3:4), obj.GlobalIntersection(1:2), globalTime);
 
 
 
-clear connections
-parse_connection = @(jSolution, nNode)connection2BVP(jSolution, nNode, stableLocalMap, unstableLocalMap);
-trueSols = [];
 
-
-for j=length(sols):-1:1
-    if sols{j}{4}
-        disp(j)
-        connections(j) = parse_connection(sols{j}, nNode);
-        trueSols(j) = sols{j}{4};
-    end
-end
-
+return
 
 %%
-close all
-trueSolIdx = find(trueSols == true);
-plotIdx = 16:20;
-
-for k = trueSolIdx(plotIdx)
-    %     connections(k) = parse_connection(sols{k}, 10000);
-    verify_true_orbit(sols{k}, connections(k), mu)
-    plot_primaries(mu, L4)
-    title(sprintf('%d',k))
+clear connections
+for j=length(sols):-1:1
+    connections(j) = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
 end
-dealfig()
+
+close all
+trueSolIdx = find([connections.TrueOrbit] == true);
+plotIdx = 1:20;  % look at 20 orbits at a time.
+
+figure
+hold on
+for k = trueSolIdx(plotIdx)
+    connections(k).plot(1000, 'LineWidth', 2)
+    axis equal
+end
+plot_primaries(mu, L4)
+return
+
+%%
+figure
+hold on
+for k = trueSolIdx
+    %     connections(k) = parse_connection(sols{k}, 10000);
+    plot_connection(connections(k), mu)
+    %     title(sprintf('%d',k))
+    %     axis equal
+end
+plot_primaries(mu, L4)
+
+
+
+% dealfig()
 
 %% check number 33
 
@@ -112,5 +130,4 @@ r0 = 1./sqrt((u(1) - mu).^2 + u(3).^2);
 s0 = 1./sqrt((u(1) + mu).^2 + u(3).^2);
 uFull = [u; r0; s0];
 end
-
 

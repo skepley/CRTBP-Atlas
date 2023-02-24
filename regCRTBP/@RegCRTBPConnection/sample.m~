@@ -1,4 +1,4 @@
-function sampleData = sample(obj, numNodes)
+function sampleData = sample(obj, varargin)
 %SAMPLE - Sample a connecting orbit from the mining algorithm into an approximation for the BVP solver.
 %
 %   Syntax:
@@ -23,10 +23,11 @@ function sampleData = sample(obj, numNodes)
 % parse input and varargin
 
 
-
-globalTime = linspace(0, obj.ConnectionTime, numNodes); % a uniform grid of global F0 time points along the entire connecting orbit
-globalTime = sort([globalTime, obj.GlobalIntersection(4)]); % Add the intersection time so that it gets evaluated in BOTH the stable and unstable orbit segments.
-% This is necessary to fix the problem which occurred when the intersecting charts had different RegTypes.
+if isempty(globalTime)
+    globalTime = linspace(0, obj.ConnectionTime, numNodes); % a uniform grid of global F0 time points along the entire connecting orbit
+    globalTime = sort([globalTime, obj.GlobalIntersection(4)]); % Add the intersection time so that it gets evaluated in BOTH the stable and unstable orbit segments.
+    % This is necessary to fix the problem which occurred when the intersecting charts had different RegTypes.
+end
 
 
 sampleData = struct; % initialize the connection struct

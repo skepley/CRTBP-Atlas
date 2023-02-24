@@ -1,4 +1,4 @@
-function CData = sample_connection_from_unstable(unstableChart, globalUnstableCoords, globalTime)
+function uData = sample_connection_from_unstable(obj, globalPhysTime)
 %SAMPLE_CONNECTION_FROM_UNSTABLE - Given a candidate intersection for two charts, follow it forward through the chart lineage 
 % (backward in time) to the local unstable manifold. Evaluation is returned in separate strands for each RegType.
 %
@@ -23,23 +23,23 @@ function CData = sample_connection_from_unstable(unstableChart, globalUnstableCo
 %   Date: 17-Jan-2023;
 
 %% Traverse connection through the unstable manifold
-unstableTime = globalTime(globalTime <= globalUnstableCoords(2));  % global time points where the orbit lies in the unstable atlas
-CData.Orbit = {};
-CData.Tau = {};
-CData.RegVector = [];
+unstableTime = globalPhysTime(globalPhysTime <= obj.GlobalIntersection(3:4)(2));  % global time points where the orbit lies in the unstable atlas
+uData.Orbit = {};
+uData.Tau = {};
+uData.RegVector = [];
 
 
 % loop through unstable lineage starting from the local manifold and moving forward in time until the intersection is reached
-chartStack =  flip(unstableChart.lineage()); % this is flipped so we can move backwards through the unstable lineage
+chartStack =  flip(obj.UnstableChart.lineage()); % this is flipped so we can move backwards through the unstable lineage
 regStack = [chartStack.RegType];
 while ~isempty(regStack)
     nextStrandIdx = find_first_diff(regStack);
     strandIdx = 1:nextStrandIdx - 1;
-    [strandOrbit, strandTau] = sample_strand(chartStack(strandIdx), unstableTime, globalUnstableCoords(1));
+    [strandOrbit, strandTau] = sample_strand(chartStack(strandIdx), unstableTime, obj.GlobalIntersection(3:4)(1));
     
-    CData.RegVector(end+1) = chartStack(1).RegType; % append the regType of this orbit segment.
-    CData.Orbit{end+1} = strandOrbit(:, 1:4).';  % end the previous orbit segment and append it to the orbit data array
-    CData.Tau{end+1} = strandTau; % append the vector of shooting times for this segment
+    uData.RegVector(end+1) = chartStack(1).RegType; % append the regType of this orbit segment.
+    uData.Orbit{end+1} = strandOrbit(:, 1:4).';  % end the previous orbit segment and append it to the orbit data array
+    uData.Tau{end+1} = strandTau; % append the vector of shooting times for this segment
     
     chartStack = chartStack(nextStrandIdx:end);  % clip the charts for this strand off the stack
     regStack = regStack(nextStrandIdx:end);  % clip the vector of RegTypes to reflect what remains on the stack
@@ -47,8 +47,8 @@ end
 
 % the terminal point of the last strand is added when the strand is terminated. But this overshoots the point of
 % intersection where the connection was found. So we throw it out.
-CData.Orbit{end} = CData.Orbit{end}(:,1:end-1);
-CData.Tau{end} = CData.Tau{end}(:,1:end-1);
+uData.Orbit{end} = uData.Orbit{end}(:,1:end-1);
+uData.Tau{end} = uData.Tau{end}(:,1:end-1);
 end % end sample_connection_from_unstable
 
 
