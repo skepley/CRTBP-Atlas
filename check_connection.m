@@ -6,60 +6,100 @@
 
 
 % first run final2.m
-load newl4_equalmass_local_manifolds % get local manifold data
-nNode = 100;
-
-j = 29;
-C = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
-cData = C.sample(100)
-% connections.plot(1000)
-
-% 
-% stableData = sample_connection_from_stable(obj.StableChart, obj.GlobalIntersection(3:4), obj.GlobalIntersection(1:2), globalTime);
-
-
-
-
-return
-
-%%
-clear connections
-for j=length(sols):-1:1
-    connections(j) = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
-end
-
 close all
-trueSolIdx = find([connections.TrueOrbit] == true);
-plotIdx = 1:20;  % look at 20 orbits at a time.
+computerPath = pcpath('mac');
+addpath('/users/shane/dropbox/matlab/tools/exportfig')
+addpath(genpath([computerPath,'Dropbox/Matlab/IMP']))
+addpath(genpath([computerPath, 'Dropbox/Regularisation3bp/CRTBP Atlas']))
+load newl4_equalmass_local_manifolds % get local manifold data
+load chk_connection_save.mat
+mu = connections(1).Parameter;
 
-figure
-hold on
-for k = trueSolIdx(plotIdx)
-    connections(k).plot(1000, 'LineWidth', 2)
+
+
+%% test functionality of RegCRTBPConnection class
+
+
+% j = 29;
+% C = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
+% figure('OuterPosition', [10, 10, 1600, 900])
+% hold on
+% C.plot(1000)
+% C.plot_connection_tangents()
+% rk45_from_intersection(C)
+
+
+
+
+% %% Try to verify connections using RK45
+% clear connections
+% for j=length(sols):-1:1
+%     connections(j) = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
+% end
+% 
+% close all
+% trueSolIdx = find([connections.TrueOrbit] == true);
+% plotIdx = 1:10;  % look at 20 orbits at a time.
+% 
+% for k = trueSolIdx(trueSolIdx > 460)
+%     figure('OuterPosition', [10, 10, 1600, 900])
+%     hold on
+%     connections(k).plot(50000, 'LineWidth', 1.5)
+%     connections(k).plot_connection_tangents()
+%     try
+%         rk45_from_intersection(connections(k))
+%         plot_primaries(mu, L4)
+%         title(sprintf('%d Score: %0.8f', k, rk45_score(connections(k))))
+%         axis equal
+%         export_fig('-png', '-transparent', sprintf('/users/shane/dropbox/Regularisation3bp/CRTBP Atlas/production runs/connections/%d.png', k))
+%         close all
+%     catch
+%         warning(sprintf('Caught one at %d',k))
+%     end
+%     
+% end
+
+% %% Try to verify connections using tangency check at the intersection point
+% % clear connections
+% % for j=length(sols):-1:1
+% %     connections(j) = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
+% % end
+% 
+% close all
+% trueSolIdx = find([connections.TrueOrbit] == true);
+% plotIdx = 1:10;  % look at 20 orbits at a time.
+% 
+% tangentSolCheck = @(C)(tangent_score(C) > 0.98);
+% 
+% for k = 1:length(connections)
+%     if isequal(connections(k).StableChart.RegType, connections(k).UnstableChart.RegType) && tangentSolCheck(connections(k))
+%         disp(tangentSolCheck(connections(k)))
+%         
+%         figure('OuterPosition', [10 + 2000, 10, 1600, 900])
+%         hold on
+%         connections(k).plot(10000, 'LineWidth', 1.5)
+%         connections(k).plot_connection_tangents()
+%         plot_primaries(mu, L4)
+%         title(sprintf('%d Score: %0.8f', k, tangent_score(connections(k))))
+%         axis equal
+%         export_fig('-png', sprintf('/users/shane/dropbox/Regularisation3bp/CRTBP Atlas/production runs/tangent_connections/%d.png', k))
+%         close all
+%     end
+%     
+% end
+
+%% These are some pretty ones
+prettyOnes = [45, 193, 461,464, 469];
+
+for k = prettyOnes
+    figure('OuterPosition', [10, 10, 1600, 900])
+    hold on
+    connections(k).plot(50000, 'LineWidth', 1.5)
+    plot_primaries(mu, L4)
     axis equal
+    export_fig('-png', sprintf('/users/shane/dropbox/Regularisation3bp/CRTBP Atlas/production runs/connections/pretty_%d.png', k))
+    dealfig()
 end
-plot_primaries(mu, L4)
-return
-
-%%
-figure
-hold on
-for k = trueSolIdx
-    %     connections(k) = parse_connection(sols{k}, 10000);
-    plot_connection(connections(k), mu)
-    %     title(sprintf('%d',k))
-    %     axis equal
-end
-plot_primaries(mu, L4)
-
-
-
-% dealfig()
-
-%% check number 33
-
-
-
 
 
 %% CODE HUNK FOR CHECKING ORBITS AGAINST RK45
@@ -78,45 +118,6 @@ plot_primaries(mu, L4)
 
 
 
-% return
-% % separate plots
-% for k = trueSolIdx
-%     C = connections(k);
-%     pl_k = figure;
-%     hold on
-%     for j = 1:length(C.Orbit)
-%         switch C.RegVector(j)
-%             case 0
-%                 jSeg = C.Orbit{j};
-%                 plot(jSeg(1,:), jSeg(3,:), 'g', 'LineWidth', 1)
-%
-%             case 1
-%                 jSeg = CRTBP2reg(C.Orbit{j}.', mu, -1).';
-%                 plot(jSeg(1,:), jSeg(3,:), 'r', 'LineWidth', 1)
-%
-%             case 2
-%                 jSeg = CRTBP2reg(C.Orbit{j}.', mu, -2).';
-%                 plot(jSeg(1,:), jSeg(3,:), 'b', 'LineWidth', 1)
-%         end
-%     end
-%     plot_primaries(mu, L4)
-%     title(sprintf('%d', k))
-%     saveas(pl_k, sprintf('/users/shane/desktop/homoclinics/orbit_%d.png', k))
-%     close 1
-% end
-
-
-%
-trueConnections = 5;
-plot_primaries(mu, L4)
-
-
-
-
-function vecRep = connection_vector(con)
-vecRep = [con.ConnectionTime, localUnstable(1), localStable(1)];  % representation to compare connection properties as vectors in C^4.
-end
-
 function plot_primaries(mu, L4)
 % plot primaries and L4
 primarySize = 100;
@@ -125,9 +126,61 @@ scatter3(mu-1,0,0,mu*primarySize,'filled','k')
 plot3(L4(1), L4(3), L4(2), 'r*')
 end
 
-function uFull = addAutoDiff(u, mu)
-r0 = 1./sqrt((u(1) - mu).^2 + u(3).^2);
-s0 = 1./sqrt((u(1) + mu).^2 + u(3).^2);
-uFull = [u; r0; s0];
+% function score = tangent_score(C)
+% % score connection based on how close to tangent the vector field is at the two intersection images
+% mu = C.Parameter;
+% if isequal(C.StableChart.RegType, C.UnstableChart.RegType)
+%     regType = C.StableChart.RegType;
+% else
+%     error('This is not implemented yet')
+% end
+% 
+% F = @(t,x)rk45regvectorfield(t, x, mu, regType);  % rk45 field to test against
+% stableInitialData = cell2mat(C.StableChart.eval(C.LocalIntersection(1:2).'));
+% unstableInitialData = cell2mat(C.UnstableChart.eval(C.LocalIntersection(3:4).'));
+% Fs = F(0, stableInitialData);
+% Fu = F(0, unstableInitialData);
+% score = dot(Fs, Fu)/(norm(Fs)*norm(Fu));  % return cos(theta) where theta is the angle between Fu and Fs
+% end
+
+function rk45_from_intersection(C)
+mu = C.Parameter;
+if isequal(C.StableChart.RegType, C.UnstableChart.RegType)
+    regType = C.StableChart.RegType;
+else
+    error('This is not implemented yet')
 end
+
+F = @(t,x)rk45regvectorfield(t, x, mu, regType);  % rk45 field to test against
+stableInitialData = cell2mat(C.StableChart.eval(C.LocalIntersection(1:2).'));
+unstableInitialData = cell2mat(C.UnstableChart.eval(C.LocalIntersection(3:4).'));
+
+plot_orbit(F, [0, 0.5], stableInitialData, [1,3], 'PlotOptions', {'b.', 'LineWidth', 2})
+plot_orbit(F, [0, 0.5], unstableInitialData, [1,3], 'PlotOptions', {'k.', 'LineWidth', 2})
+plot_orbit(F, [0, -0.5], stableInitialData, [1,3], 'PlotOptions', {'b.', 'LineWidth', 2})
+plot_orbit(F, [0, -0.5], unstableInitialData, [1,3], 'PlotOptions', {'k.', 'LineWidth', 2})
+end
+
+function score = rk45_score(C)
+% score connection based on far the orbits are after +- 0.5 time units after integrating from the two intersection images
+
+mu = C.Parameter;
+if isequal(C.StableChart.RegType, C.UnstableChart.RegType)
+    regType = C.StableChart.RegType;
+else
+    error('This is not implemented yet')
+end
+F = @(t,x)rk45regvectorfield(t, x, mu, regType);  % rk45 field to test against
+stableInitialData = cell2mat(C.StableChart.eval(C.LocalIntersection(1:2).'));
+unstableInitialData = cell2mat(C.UnstableChart.eval(C.LocalIntersection(3:4).'));
+forward_score = norm(tau_map(F, [0, 0.5], stableInitialData) - tau_map(F, [0, 0.5], unstableInitialData));
+backward_score = norm(tau_map(F, [0, -0.5], stableInitialData) - tau_map(F, [0, -0.5], unstableInitialData));
+score = forward_score + backward_score;
+end
+
+% function uFull = addAutoDiff(u, mu)
+% r0 = 1./sqrt((u(1) - mu).^2 + u(3).^2);
+% s0 = 1./sqrt((u(1) + mu).^2 + u(3).^2);
+% uFull = [u; r0; s0];
+% end
 

@@ -23,8 +23,7 @@ function [output1,output2] = plot(obj, nNode, varargin)
 
 sampleData = obj.sample(nNode);
 mu = obj.Parameter;
-
-figure
+hold_state = ishold;  % check if hold is on 
 hold on
 for iStrand = 1:length(sampleData.Orbit)
     switch sampleData.RegVector(iStrand)
@@ -40,6 +39,9 @@ for iStrand = 1:length(sampleData.Orbit)
             jSeg = CRTBP2reg(sampleData.Orbit{iStrand}.', mu, -2).';
             plot(jSeg(1,:), jSeg(3,:), 'b', 'LineWidth', 1, varargin{:})
     end
+end
+if ~hold_state
+    hold off  % turn hold back off if it was off when we started
 end
 
 end % end plot

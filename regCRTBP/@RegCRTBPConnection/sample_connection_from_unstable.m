@@ -23,7 +23,7 @@ function uData = sample_connection_from_unstable(obj, globalPhysTime)
 %   Date: 17-Jan-2023;
 
 %% Traverse connection through the unstable manifold
-unstableTime = globalPhysTime(globalPhysTime <= obj.GlobalIntersection(3:4)(2));  % global time points where the orbit lies in the unstable atlas
+unstableTime = globalPhysTime(globalPhysTime <= obj.GlobalIntersection(4));  % global time points where the orbit lies in the unstable atlas
 uData.Orbit = {};
 uData.Tau = {};
 uData.RegVector = [];
@@ -35,7 +35,7 @@ regStack = [chartStack.RegType];
 while ~isempty(regStack)
     nextStrandIdx = find_first_diff(regStack);
     strandIdx = 1:nextStrandIdx - 1;
-    [strandOrbit, strandTau] = sample_strand(chartStack(strandIdx), unstableTime, obj.GlobalIntersection(3:4)(1));
+    [strandOrbit, strandTau] = sample_strand(chartStack(strandIdx), unstableTime, obj.GlobalIntersection(3));
     
     uData.RegVector(end+1) = chartStack(1).RegType; % append the regType of this orbit segment.
     uData.Orbit{end+1} = strandOrbit(:, 1:4).';  % end the previous orbit segment and append it to the orbit data array

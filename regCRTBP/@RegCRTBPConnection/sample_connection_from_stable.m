@@ -1,4 +1,4 @@
-function sData = sample_connection_from_stable(globalPhysTime)
+function sData = sample_connection_from_stable(obj, globalPhysTime)
 %SAMPLE_CONNECTION_FROM_STABLE - Given a candidate intersection for two charts, follow it backward through the chart lineage
 % (forward in time) to the local stable manifold. Evaluation is returned in separate strands for each RegType.
 %
@@ -23,8 +23,8 @@ function sData = sample_connection_from_stable(globalPhysTime)
 %   Date: 23-Jan-2023;
 
 %% Traverse the connection through the stable manifold
-stableTime = globalPhysTime(globalPhysTime >= obj.GlobalIntersection(3:4)(2)) - obj.GlobalIntersection(3:4)(2); % global time points where the orbit lies in the stable atlas
-stableTime = stableTime + obj.GlobalIntersection(1:2)(2);
+stableTime = globalPhysTime(globalPhysTime >= obj.GlobalIntersection(4)) - obj.GlobalIntersection(4); % global time points where the orbit lies in the stable atlas
+stableTime = stableTime + obj.GlobalIntersection(2);
 stableTime(end) = 0; % zero out final stable time to deal with rounding errors
 sData.Orbit = {};
 sData.Tau = {};
@@ -36,7 +36,7 @@ regStack = [chartStack.RegType];
 while ~isempty(regStack)
     nextStrandIdx = find_first_diff(regStack);
     strandIdx = 1:nextStrandIdx - 1;
-    [strandOrbit, strandTau] = sample_strand(chartStack(strandIdx), stableTime, obj.GlobalIntersection(1:2)(1));
+    [strandOrbit, strandTau] = sample_strand(chartStack(strandIdx), stableTime, obj.GlobalIntersection(1));
     
     sData.RegVector(end+1) = chartStack(1).RegType; % append the regType of this orbit segment.
     sData.Orbit{end+1} = strandOrbit(:, 1:4).';  % end the previous orbit segment and append it to the orbit data array

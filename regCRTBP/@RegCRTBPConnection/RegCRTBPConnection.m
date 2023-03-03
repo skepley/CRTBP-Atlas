@@ -58,12 +58,12 @@ classdef RegCRTBPConnection < handle
                 
                 obj.StableChart = connectionIntersectionData{1};
                 obj.UnstableChart = connectionIntersectionData{2};
-                obj.LocalIntersection = connectionIntersectionData{3};  % [stableSpace, stableRegTime, unstableSpace]
+                obj.LocalIntersection = [connectionIntersectionData{3}; 0];  % [stableSpace; stableRegTime; unstableSpace; unstableTime]
                 
                 localStablePhysTime = taylorregtime(obj.StableChart, obj.LocalIntersection(2));
                 
                 obj.GlobalIntersection = [obj.StableChart.local2global([obj.LocalIntersection(1), localStablePhysTime]),...
-                    obj.UnstableChart.local2global([obj.LocalIntersection(3), 0])]; % [stableSpace, stableTime, unstableSpace, unstableTime]
+                    obj.UnstableChart.local2global([obj.LocalIntersection(3), 0])].'; % [stableSpace, stableTime, unstableSpace, unstableTime]
                 obj.ConnectionTime = obj.GlobalIntersection(4) - obj.GlobalIntersection(2);  % time of flight in physical time
                 obj.TrueOrbit = connectionIntersectionData{4};
                 obj.LocalMaps = {stableLocalMap, unstableLocalMap};
