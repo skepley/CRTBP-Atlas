@@ -15,7 +15,7 @@ function varargout = regtime(obj)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 21-May-2019; Last revision: 13-Aug-2020
 
 %% parse input

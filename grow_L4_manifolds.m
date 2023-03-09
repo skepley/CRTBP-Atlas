@@ -12,7 +12,7 @@
 %   See also: GROW_COLLISION_MANIFOLDS, MINE_CONNECTIONS 
  
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 12-Jun-2019; Last revision: 2-Oct-2019
 
 clear all

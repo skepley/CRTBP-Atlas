@@ -22,10 +22,11 @@ function unstableBd = L4_local_unstable_boundary(localDataFileName, numUnstableS
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 04-Mar-2022; Last revision: 04-Mar-2022
 
 % first lift local L4 unstable manifold into phase space and get boundary
+error('This function was merged into local_unstable_boundary.m')
 
 load(localDataFileName) % get local manifold data and pick off coordinates
 XuLocal = mid(Au);

@@ -21,7 +21,7 @@ function orbitData = orbit(obj, globalSpace, globalTime, varargin)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 04-Jul-2019; Last revision: 22-Apr-2020
 
 

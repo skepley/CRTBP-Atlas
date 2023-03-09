@@ -7,7 +7,7 @@ function f = rk45regvectorfield(t,v,parameter,regType)
 %
 %   Inputs:
 %       parameter - MU or [MU,C] depending on regularization type
-%       regType - 0,1, or 2
+%       regType - 0, 1, or 2
 %
 %   Outputs:
 %       f - evaluation of f_0,f_1, or f_2 at (t,x)
@@ -18,8 +18,10 @@ function f = rk45regvectorfield(t,v,parameter,regType)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
-%   Date: 30-Mar-2019; Last revision: 09-Apr-2019
+%   email: s.kepley@vu.nl
+%   Date: 30-Mar-2019
+
+with_automatic_diff = length(v) > 4;
 
 switch regType
     case 0 % stanrdard CRTBP vector field
@@ -36,8 +38,14 @@ switch regType
         p = v(2:6:end);
         y = v(3:6:end);
         q = v(4:6:end);
-        r1 = v(5:6:end);
-        r2 = v(6:6:end);
+        
+        if with_automatic_diff
+            r1 = v(5:6:end);
+            r2 = v(6:6:end);
+        else  % added to allow evaluation of the vector field on R^4
+            r1 = 1./sqrt((x - MU).^2 + y.^2);
+            r2 = 1./sqrt((x + mu1).^2 + y.^2);
+        end
         r1c = r1.^3;
         r2c = r2.^3;
         
@@ -53,8 +61,11 @@ switch regType
         f(2:6:end) = f2;
         f(3:6:end) = f3;
         f(4:6:end) = f4;
-        f(5:6:end) = f5;
-        f(6:6:end) = f6;
+        if with_automatic_diff
+            f(5:6:end) = f5;
+            f(6:6:end) = f6;
+        end
+        
     otherwise % regularized CRTBP vector field
         %           F_1 OR F_2 VECTOR FIELD WITH VARIABLES (x,p,y,q,r)
         %           xdot = p
@@ -92,7 +103,11 @@ switch regType
         p = v(2:5:end);
         y = v(3:5:end);
         q = v(4:5:end);
-        r = v(5:5:end);
+        if with_automatic_diff
+            r = v(5:5:end);
+        else  % added to allow evaluation of the vector field on R^4
+            r = 1./sqrt((x.^2 + y.^2).^2 + 1 + 2*REG_BIT*(x.^2 - y.^2));
+        end
         k = x.^2 + y.^2;
         
         f = zeros(size(v));
@@ -106,14 +121,9 @@ switch regType
         f(2:5:end) = f2;
         f(3:5:end) = f3;
         f(4:5:end) = f4;
-        f(5:5:end) = f5;
+        if with_automatic_diff
+            f(5:5:end) = f5;
+        end
 end
 
 end % end rk45regvectorfield
-
-% Revision History:
-%{
-09-Apr-2019 - Added support for all 3 CRTBP vector fields.
-29-Sep-2019 - Added an error for specifying an energy for F0, or failing to
-    specify one for F1/F2. 
-%}

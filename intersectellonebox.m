@@ -18,7 +18,7 @@ function isIntersecting = intersectellonebox(chart1, chart2)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 12-Jun-2019; Last revision: 17-May-2021
 
 % first rule out using ell-1 box method

@@ -1,22 +1,29 @@
 %CHECK_CONNECTION
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 10-Aug-2020; Last revision: 19-Aug-2020
 
 
 % first run final2.m
 close all
+% clearvars
 computerPath = pcpath('mac');
 addpath('/users/shane/dropbox/matlab/tools/exportfig')
 addpath(genpath([computerPath,'Dropbox/Matlab/IMP']))
 addpath(genpath([computerPath, 'Dropbox/Regularisation3bp/CRTBP Atlas']))
 load newl4_equalmass_local_manifolds % get local manifold data
 load chk_connection_save.mat
+% clear connections
+% for j=length(sols):-1:1
+%     connections(j) = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
+% end
+% ctimes = [connections.ConnectionTime];
+% min(ctimes)
+% save('chk_connection_save.mat', 'connections')
 mu = connections(1).Parameter;
 
-
-
+return
 %% test functionality of RegCRTBPConnection class
 
 
@@ -30,51 +37,48 @@ mu = connections(1).Parameter;
 
 
 
-
-% %% Try to verify connections using RK45
-% clear connections
-% for j=length(sols):-1:1
-%     connections(j) = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
-% end
-% 
-% close all
-% trueSolIdx = find([connections.TrueOrbit] == true);
+%% Try to verify connections using RK45
+close all
+trueSolIdx = find([connections.TrueOrbit] == true);
 % plotIdx = 1:10;  % look at 20 orbits at a time.
-% 
-% for k = trueSolIdx(trueSolIdx > 460)
+
+figure 
+hold on
+for k = trueSolIdx
+    disp(k)
 %     figure('OuterPosition', [10, 10, 1600, 900])
 %     hold on
-%     connections(k).plot(50000, 'LineWidth', 1.5)
-%     connections(k).plot_connection_tangents()
-%     try
-%         rk45_from_intersection(connections(k))
-%         plot_primaries(mu, L4)
-%         title(sprintf('%d Score: %0.8f', k, rk45_score(connections(k))))
-%         axis equal
-%         export_fig('-png', '-transparent', sprintf('/users/shane/dropbox/Regularisation3bp/CRTBP Atlas/production runs/connections/%d.png', k))
-%         close all
-%     catch
-%         warning(sprintf('Caught one at %d',k))
-%     end
-%     
-% end
-
+    connections(k).plot(1000, 'LineWidth', 1.5)
+    %     connections(k).plot_connection_tangents()
+    %     try
+    %         rk45_from_intersection(connections(k))
+    %         plot_primaries(mu, L4)
+    %         title(sprintf('%d Score: %0.8f', k, rk45_score(connections(k))))
+    %         axis equal
+    %         export_fig('-png', '-transparent', sprintf('/users/shane/dropbox/Regularisation3bp/CRTBP Atlas/production runs/connections/%d.png', k))
+    %         close all
+    %     catch
+    %         warning(sprintf('Caught one at %d',k))
+    %     end
+    
+end
+return
 % %% Try to verify connections using tangency check at the intersection point
 % % clear connections
 % % for j=length(sols):-1:1
 % %     connections(j) = RegCRTBPConnection(sols{j}, stableLocalMap, unstableLocalMap);
 % % end
-% 
+%
 % close all
 % trueSolIdx = find([connections.TrueOrbit] == true);
 % plotIdx = 1:10;  % look at 20 orbits at a time.
-% 
+%
 % tangentSolCheck = @(C)(tangent_score(C) > 0.98);
-% 
+%
 % for k = 1:length(connections)
 %     if isequal(connections(k).StableChart.RegType, connections(k).UnstableChart.RegType) && tangentSolCheck(connections(k))
 %         disp(tangentSolCheck(connections(k)))
-%         
+%
 %         figure('OuterPosition', [10 + 2000, 10, 1600, 900])
 %         hold on
 %         connections(k).plot(10000, 'LineWidth', 1.5)
@@ -85,7 +89,7 @@ mu = connections(1).Parameter;
 %         export_fig('-png', sprintf('/users/shane/dropbox/Regularisation3bp/CRTBP Atlas/production runs/tangent_connections/%d.png', k))
 %         close all
 %     end
-%     
+%
 % end
 
 %% These are some pretty ones
@@ -134,7 +138,7 @@ end
 % else
 %     error('This is not implemented yet')
 % end
-% 
+%
 % F = @(t,x)rk45regvectorfield(t, x, mu, regType);  % rk45 field to test against
 % stableInitialData = cell2mat(C.StableChart.eval(C.LocalIntersection(1:2).'));
 % unstableInitialData = cell2mat(C.UnstableChart.eval(C.LocalIntersection(3:4).'));

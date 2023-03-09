@@ -5,7 +5,7 @@
 %   MAT-files required: l4_equalmass_local_manifolds
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 20-Sep-2019; Last revision: 20-Sep-2019
 
 % SET PATH AND SAVE VARIABLES

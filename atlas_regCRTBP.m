@@ -6,7 +6,7 @@
 %   See also: OTHER_SCRIPT_NAME,  OTHER_FUNCTION_NAME
  
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 19-Mar-2019; Last revision: 19-Mar-2019
 
 % ================================================== SET UP SYSTEM PATH PROPERTIES ==================================================

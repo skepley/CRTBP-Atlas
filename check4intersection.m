@@ -13,7 +13,7 @@ function [isTrue, sols] = check4intersection(chart1, chart2, nInitialCondition, 
 %       sols - a vector of the form x = (s1, t1, s2) such that Q(s2, t0) = P(s1, t1) in the 3 coordinates specified.
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 21-Mar-2019; Last revision: 10-Mar-2021
 
 %% parse input
@@ -141,7 +141,7 @@ function [F, DF, N] = setnewtonmap(mu, P, Q, dPds, dPdt, dQdr, projmap, PQregTyp
 PQRegTypeCase = 3*PQregType(1) + PQregType(2);  % treat PQregType as a ternary expansion and convert integer case number
 trimAD = @(u)u(1:4);  % remove automatic differentiation coordinates from the regularization map implementation
 switch PQRegTypeCase
-    case {0, 4, 8} % {[0, 0], [1, 1], [2, 2]} Charts have the same RegType
+    case 0 % Both charts are in f_0 coordinates so apply the naive zero finding map
         F = @(u)projmap(P(u(1),u(2)) - Q(u(3)));
         DF = @(u)projmap([dPds(u(1),u(2)), dPdt(u(1),u(2)), -dQdr(u(3))]);
         
@@ -169,16 +169,23 @@ switch PQRegTypeCase
         DF = @(u)projmap(cat(2, diffCRTBP2reg(P(u(1), u(2)))*[dPds(u(1),u(2)), dPdt(u(1),u(2))],...
             -dQdr(u(3))));
         
-    case 5  % [1, 2] compose both P and Q with inverse regularization maps taking them to u_0
-        PregMap = @(u)trimAD(CRTBP2reg(u.', mu, -1)).';
-        QregMap = @(u)trimAD(CRTBP2reg(u.', mu, -2)).';
-        F = @(u)projmap(PregMap(P(u(1),u(2))) - QregMap(Q(u(3))));
-        DF = @(u)projmap(cat(2, diffCRTBP2reg(P(u(1), u(2)))*[dPds(u(1),u(2)), dPdt(u(1),u(2))],...
-            -diffCRTBP2reg(Q(u(3)))*dQdr(u(3))));
+        %     case 5  % [1, 2] compose both P and Q with inverse regularization maps taking them to u_0
+        %         PregMap = @(u)trimAD(CRTBP2reg(u.', mu, -1)).';
+        %         QregMap = @(u)trimAD(CRTBP2reg(u.', mu, -2)).';
+        %         F = @(u)projmap(PregMap(P(u(1),u(2))) - QregMap(Q(u(3))));
+        %         DF = @(u)projmap(cat(2, diffCRTBP2reg(P(u(1), u(2)))*[dPds(u(1),u(2)), dPdt(u(1),u(2))],...
+        %             -diffCRTBP2reg(Q(u(3)))*dQdr(u(3))));
         
-    case 7  % [2, 1]  compose both P and Q with inverse regularization maps taking them to u_0
-        PregMap = @(u)trimAD(CRTBP2reg(u.', mu, -2)).';
-        QregMap = @(u)trimAD(CRTBP2reg(u.', mu, -1)).';
+        %     case 7  % [2, 1]  compose both P and Q with inverse regularization maps taking them to u_0
+        %         PregMap = @(u)trimAD(CRTBP2reg(u.', mu, -2)).';
+        %         QregMap = @(u)trimAD(CRTBP2reg(u.', mu, -1)).';
+        %         F = @(u)projmap(PregMap(P(u(1),u(2))) - QregMap(Q(u(3))));
+        %         DF = @(u)projmap(cat(2, diffCRTBP2reg(P(u(1), u(2)))*[dPds(u(1),u(2)), dPdt(u(1),u(2))],...
+        %             -diffCRTBP2reg(Q(u(3)))*dQdr(u(3))));
+        
+    case {4, 5, 7, 8} % {[1, 1], [1,2], [2,1], [2, 2]} compose both P and Q with inverse regularization maps taking them to u_0
+        PregMap = @(u)trimAD(CRTBP2reg(u.', mu, -PQregType(1))).';
+        QregMap = @(u)trimAD(CRTBP2reg(u.', mu, -PQregType(2))).';
         F = @(u)projmap(PregMap(P(u(1),u(2))) - QregMap(Q(u(3))));
         DF = @(u)projmap(cat(2, diffCRTBP2reg(P(u(1), u(2)))*[dPds(u(1),u(2)), dPdt(u(1),u(2))],...
             -diffCRTBP2reg(Q(u(3)))*dQdr(u(3))));

@@ -1,4 +1,4 @@
-function [output1,output2] = new_run_script(templateFilename, saveAsFilename, mu, energy, time, source, target)
+function new_run_script(templateFilename, saveAsFilename, mu, energy, time, source, target)
 % NEW_RUN_SCRIPT - Generate a new run script from a given template and a choice of mass, energy, source, target, and integration parameters
 
 % NEW_RUN_SCRIPT() - A more detailed description of the function

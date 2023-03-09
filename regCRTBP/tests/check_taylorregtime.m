@@ -1,8 +1,5 @@
 %CHECK_TAYLORREGTIME - One line description of what the script performs (H1 line)
-%   Optional file header info (to give more details about the function than in the H1 line)
-%   Optional file header info (to give more details about the function than in the H1 line)
-%   Optional file header info (to give more details about the function than in the H1 line)
-%
+
 %   Description:
 %       CHECK_TAYLORREGTIME description
 %
@@ -15,8 +12,11 @@
 %   See also: OTHER_SCRIPT_NAME,  OTHER_FUNCTION_NAME
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 22-Apr-2020; Last revision: 22-Apr-2020
+
+warning('This has not been updated to the new calling syntax for RegCRTBPCharts which requires an energy')
+
 
 clear all
 close all

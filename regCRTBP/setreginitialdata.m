@@ -20,7 +20,7 @@ function initialData = setreginitialdata(mu, regType, N, arc, isValid)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 18-Jun-2019; Last revision: 18-Jun-2019
 
 arcMid = arc(1);

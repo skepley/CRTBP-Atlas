@@ -7,7 +7,7 @@
 %       Time: +/- 7 units
 %
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 06-Feb-2020; Last revision: 08-Mar-2021
 
 

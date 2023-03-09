@@ -21,6 +21,9 @@ function sampleData = sample(obj, numNodes)
 %   Date: 23-Feb-2023;
 
 
+warning('OFF', 'Chart:eval');  % turn off Chart.eval warning messages
+warning('OFF', 'Chart:local2global'); 
+
 globalTime = linspace(0, obj.ConnectionTime, numNodes); % a uniform grid of global F0 time points along the entire connecting orbit
 globalTime = sort([globalTime, obj.GlobalIntersection(4)]); % Add the intersection time so that it gets evaluated in BOTH the stable and unstable orbit segments.
 % This is necessary to fix the problem which occurred when the intersecting charts had different RegTypes.

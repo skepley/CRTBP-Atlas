@@ -21,7 +21,7 @@ function newObj = hotswap(obj, swapTo)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 14-Apr-2019; Last revision: 17-Jun-2020
 
 obj.TimeSpan
@@ -40,8 +40,8 @@ if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original functio
             p0 = obj.Coordinate(2);
             y0 = obj.Coordinate(3);
             q0 = obj.Coordinate(4);
-            %             C = CRTBPenergy([x0.Coefficient(1), p0.Coefficient(1), y0.Coefficient(1), q0.Coefficient(1)]', mu, 0);
-            C = meanenergy(obj);  % compute mean anergy evaluated over 100 uniformly spaced nodes.
+            C = obj.RegEnergy;
+            
 
             % map to regularized coordinates
             z = x0 + y0*1i;
@@ -51,7 +51,7 @@ if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original functio
             p1 = 2*(x1*p0 + y1*q0);
             q1 = 2*(x1*q0 - y1*p0);
             newID = [x1.Coefficient; p1.Coefficient; y1.Coefficient; q1.Coefficient];
-            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
+            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, obj.RegEnergy, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
             
         case -1 % map from F1 (regularized) to F0 (standard) coordinates
             % unpack the old coordinates
@@ -71,7 +71,7 @@ if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original functio
             y0 = 2*x1*y1;
             q0 = (y1*p1 + x1*q1)*k1Inverse*0.5;
             newID = [x0.Coefficient; p0.Coefficient; y0.Coefficient; q0.Coefficient];
-            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, mu, swapTo, 'InitialScaling', .1, 'boundary', true);
+            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, obj.RegEnergy, mu, swapTo, 'InitialScaling', .1, 'boundary', true);
             
         case 2 % map from F0 (standard) to F2 (regularized) coordinates
             % unpack the old coordinates
@@ -80,7 +80,8 @@ if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original functio
             y0 = obj.Coordinate(3);
             q0 = obj.Coordinate(4);
             %             C = CRTBPenergy([x0.Coefficient(1), p0.Coefficient(1), y0.Coefficient(1), q0.Coefficient(1)]', mu, 0); % compute energy of regularization at center of boundary arc
-            C = meanenergy(obj);  % compute mean anergy evaluated over 100 uniformly spaced nodes.
+            %             C = meanenergy(obj);  % compute mean anergy evaluated over 100 uniformly spaced nodes.
+            C = obj.RegEnergy;
             
             % map to regularized coordinates
             z = x0 + 1i*y0;
@@ -90,7 +91,7 @@ if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original functio
             p2 = 2*(x2*p0 + y2*q0);
             q2 = 2*(x2*q0 - y2*p0);
             newID = [x2.Coefficient; p2.Coefficient; y2.Coefficient; q2.Coefficient];
-            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
+            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, obj.RegEnergy, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
             
         case -2 % map from F2 (regularized) to F0 (standard) coordinates
             % unpack the old coordinates
@@ -110,7 +111,7 @@ if isequal(swapTo, 0) || isequal(obj.RegType, 0)  % this is the original functio
             y0 = 2*x1*y1;
             q0 = (y1*p1 + x1*q1)*invk1*0.5;
             newID = [x0.Coefficient; p0.Coefficient; y0.Coefficient; q0.Coefficient];
-            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, mu, swapTo, 'InitialScaling', .1, 'boundary', true);
+            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, obj.RegEnergy, mu, swapTo, 'InitialScaling', .1, 'boundary', true);
             
         otherwise
             error('Valid mapping values are {-2,-1,0,1,2}')
@@ -150,7 +151,7 @@ else  % updated version of the code includes swapping between regularized coordi
             p2 = p0Term*x2 + q0Term*y2;
             q2 = q0Term*x2 - p0Term*y2;
             newID = [x2.Coefficient; p2.Coefficient; y2.Coefficient; q2.Coefficient];
-            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
+            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, obj.RegEnergy, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
             
         case 2  % compute u_1 = F_1 o F_2^{-1} (u_2)
             % unpack the old coordinates
@@ -185,7 +186,7 @@ else  % updated version of the code includes swapping between regularized coordi
             p1 = p0Term*x1 + q0Term*y1;
             q1 = q0Term*x1 - p0Term*y1;
             newID = [x1.Coefficient; p1.Coefficient; y1.Coefficient; q1.Coefficient];
-            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
+            newObj = RegCRTBPChart(newID, coordinateBasis, obj.TimeSpan, obj.Truncation, obj.RegEnergy, [mu,C], swapTo, 'InitialScaling', .1, 'boundary', true);
             
     end
     

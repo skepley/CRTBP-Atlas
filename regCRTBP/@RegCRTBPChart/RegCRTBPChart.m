@@ -26,7 +26,7 @@ classdef RegCRTBPChart < Chart
     %   MAT-files required: none
     
     %   Author: Shane Kepley
-    %   email: shane.kepley@rutgers.edu
+    %   email: s.kepley@vu.nl
     %   Date: 07-Mar-2019; Last revision: 20-Feb-2020
     %
     %   ToDo: 1. RegCRTBPChart/hotswap needs to inherit the initial error when coordinate swapping before this computation can be made rigorous. 
@@ -34,6 +34,7 @@ classdef RegCRTBPChart < Chart
     properties
         % ToDo: The localTime property is a confusing name. It should be renamed "RegTime" since LocalTime refers to Chart local time vs global (atlas) time. 
         RegType; % 0, 1, or 2 denotes a chart with respect to F0, F1, or F2.
+        RegEnergy; % Isoenergetic set in which this manifold exists. This is the energy at which the vector fields will be regularized with respect to. 
         Parameter; % mu or [mu,C]
         LocalTime; % Keep track of the regularized local time so this information can be passed to the BVP solver.
     end
@@ -43,7 +44,7 @@ classdef RegCRTBPChart < Chart
     
     %% ---------------------------------------METHODS--------------------------------------------------%%
     methods
-        function obj = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, varargin)
+        function obj = RegCRTBPChart(initialData, basis, initialTime, truncation, regEnergy, parameter, regType, varargin)
             % class constructor
             if(nargin > 0)
                 % parse input
@@ -52,6 +53,7 @@ classdef RegCRTBPChart < Chart
                 addRequired(p,'basis') % Taylor, Fourier, or Chebyshev
                 addRequired(p,'initialTime') % 1-by-1 double
                 addRequired(p,'truncation') % 1-by-(1+d) integer
+                addRequired(p,'regEnergy') % 1-by-1 double
                 addRequired(p,'parameter') % [mu,C] mu is the small mass, C is the regularization energy
                 addRequired(p,'regType') % regularization type of this chart
                 addParameter(p,'MaxTau', Inf) % scalar double
@@ -64,8 +66,10 @@ classdef RegCRTBPChart < Chart
                 % addParameter(p,'Weight', 'ones') % vector of weights for the ell_1 space to work in
                 
                 % parse variable arguments
-                parse(p, initialData, basis, initialTime, truncation, parameter, regType, varargin{:})
+                parse(p, initialData, basis, initialTime, truncation, regEnergy, parameter, regType, varargin{:})
                 obj.RegType = p.Results.regType; % set the regularization type
+                obj.RegEnergy = p.Results.regEnergy; 
+                obj.Parameter = p.Results.parameter;
                 obj.TimeSpan = p.Results.initialTime;
                 obj.Tau = p.Results.InitialScaling; % Setting << 1 improves precision of multiplication when FFT is required. The recursion solves instead x' = Lf(x,Lt).
                 obj.InitialError = p.Results.InitialError;
@@ -90,10 +94,8 @@ classdef RegCRTBPChart < Chart
                 
                 % set parameters to intervals when doing validated computations
                 if isequal(obj.NumericalClass,'intval')
-                    obj.Parameter = intval(p.Results.parameter);
                     obj.IsValid = true;
                 elseif isequal(obj.NumericalClass,'double')
-                    obj.Parameter = p.Results.parameter;
                     obj.IsValid = false;
                 end
                 

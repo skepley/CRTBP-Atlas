@@ -16,7 +16,7 @@ function validateinitialdata(obj)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 19-Mar-2019; Last revision: 10-Apr-2019
 
 % TODO: This needs to be done with validation. The correct way to do it is to solve the ODE: r' = -0.5*u'*r^3 which gives r = 1/sqrt(u).

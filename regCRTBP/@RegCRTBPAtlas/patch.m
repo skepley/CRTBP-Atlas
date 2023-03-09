@@ -24,7 +24,7 @@ function varargout = patch(obj, evalNode, chartRegType, plotRegType, plotIdx, va
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 06-Feb-2020; Last revision: 21-Apr-2020
 
 %% parse input 

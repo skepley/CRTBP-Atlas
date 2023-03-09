@@ -37,7 +37,7 @@ function generatecoefficient(obj, tau)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 07-Mar-2019; Last revision: 20-Feb-2020
 
 if size(obj.Coordinate(1),1) > 1

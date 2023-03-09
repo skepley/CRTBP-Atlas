@@ -12,7 +12,7 @@ function chunkysave(atlas, savePath, saveName, varargin)
 % atlas data
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 06-Feb-2021; Last revision: 06-Feb-2021
 
 %% ================================================== SECTION 1 ==================================================

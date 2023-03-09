@@ -7,7 +7,7 @@ function chartSlice = chartbytype(obj, regType)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 20-May-2021; Last revision: 20-May-2021
 
 chartSlice = obj.Chart([obj.Chart.RegType] == regType);

@@ -20,7 +20,7 @@ function decayEstimate = scalardecaymap(x, M, parameter, regType)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 20-Feb-2020; Last revision: 9-Mar-2020
 
 if isequal(regType, 0)

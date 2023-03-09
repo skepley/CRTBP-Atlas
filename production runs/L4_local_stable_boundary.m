@@ -22,10 +22,11 @@ function stableBd = L4_local_stable_boundary(localDataFileName, numStableSegment
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 06-Mar-2022; Last revision: 06-Mar-2022
 
 % first lift local L4 stable manifold into phase space and get boundary
+error('This function was merged into local_stable_boundary.m')
 load(localDataFileName) % get local manifold data and pick off coordinates
 XsLocal = mid(As);
 PsLocal = mid(Bs);

@@ -1,8 +1,10 @@
 %CHECK_REGCRTBP - testing, validation, and debugging for RegCRTBPChart class for 1 dimensional initial data
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 22-Apr-2020; Last revision: 22-Apr-2020
+
+warning('This has not been updated to the new calling syntax for RegCRTBPCharts which requires an energy')
 
 clear all
 close all

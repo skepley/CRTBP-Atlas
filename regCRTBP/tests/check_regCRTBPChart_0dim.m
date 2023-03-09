@@ -1,10 +1,11 @@
 %CHECK_REGCRTBP - testing, validation, and debugging for RegCRTBPChart class for 0 dimensional initial data
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 22-Apr-2020; Last revision: 22-Apr-2020
 
-clear all
+warning('This has not been updated to the new calling syntax for RegCRTBPCharts which requires an energy')
+clearvars
 close all
 clc
 computerPath = pcpath('mac');
@@ -34,7 +35,7 @@ switch regType
         p1 = [0.7104, 0.2973, 0.2554, 0.2068];
         initialData = p1.';
         % Integrate multiple timesteps
-        bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess, 'boundary', true);
+%         bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess, 'boundary', true);
         cht = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess);
 %         % Integrate multiple timesteps
 %         A0 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
@@ -44,14 +45,12 @@ switch regType
         
         % plot orbits
         figure;
-        hold on
-        s = 0;        
+        hold on      
         try
-            ob = cell2mat(cht.eval([s*ones(length(tf),1),linspace(0,1,length(tf))']));
-            disp('here')
+            ob = cht.eval(tf');
+            ob = cell2mat(ob')';
         catch
-            ob = mid(A0.orbit(s, tf));
-            disp('here2')
+            
         end
         
         plot3(ob(:,1), ob(:,3), ob(:,2), 'k', 'LineWidth',2)
@@ -67,36 +66,27 @@ switch regType
         C = 3;
         parameter = [mu,C];
         
-        
         % set up some initial data on a line
         p1 = [0.7104, 0.2973, 0.2554, 0.2068];
-        p2 = p1 + 1e-4*ones(size(p1));
-        initialData = cat(2, 0.5*[p1+p2; p2-p1]', zeros(4,N-2));
-        
-        %         % set up some initial data on a circle
-        %         thetaMid = 0;
-        %         thetaRadius = .0001;
-        %         expCoeff = sqrt(8*mu)*exp(1i*thetaMid)*((1i*thetaRadius).^(0:N-1)./factorial(0:N-1));
-        %         xInitial = zeros(1,N);
-        %         pInitial = real(expCoeff);
-        %         yInitial = zeros(1,N);
-        %         qInitial = imag(expCoeff);
-        %         initialData = [xInitial;pInitial;yInitial;qInitial];
-        
-        % Integrate multiple timesteps
+        initialData = p1.';
         bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess, 'boundary', true);
-        maxTau = .3;
-        A1 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
-        while ~isempty(A1.LeafStack)
-            A1.growboundary()
-        end
+        cht = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess);
+        
+%         % Integrate multiple timesteps
+%         bd = RegCRTBPChart(initialData, basis, initialTime, truncation, parameter, regType, 'InitialScaling', tauGuess, 'boundary', true);
+%         maxTau = .3;
+%         A1 = RegCRTBPAtlas(bd, tauGuess, bdCheck, @advectioncheck, 'MaxTau', maxTau);
+%         while ~isempty(A1.LeafStack)
+%             A1.growboundary()
+%         end
         
         % plot orbits
         figure;
         hold on
-        s = 0;
-        ob = mid(A1.orbit(s, tf));
-        
+        s = 0;  
+
+        ob = cht.eval([s*ones(length(tf),1),linspace(0,1,length(tf))']);
+        ob = cell2mat(ob')';
         plot3(ob(:,1), ob(:,3), ob(:,2), 'k', 'LineWidth',2)
         
         % set up rk45 evaluation

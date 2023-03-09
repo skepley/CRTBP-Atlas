@@ -11,7 +11,7 @@ function advect(obj, tau)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 21-May-2019; Last revision: 21-May-2019
 
 %ADVECT Advect the (d-1) dimensional boundary of a chart to generate the d dimensional interior chart

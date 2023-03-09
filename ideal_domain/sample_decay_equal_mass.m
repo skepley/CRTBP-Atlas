@@ -10,7 +10,7 @@
 %   MAT-files required: none
 %
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 29-Mar-2020; Last revision: 29-Mar-2020
 
 %% ================================================== SECTION 1 ==================================================

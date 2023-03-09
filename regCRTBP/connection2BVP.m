@@ -17,14 +17,14 @@ function cData = connection2BVP(connectionData, nNode, stableLocalMap, unstableL
 %
 %   Outputs:
 %       connection - A struct with the data necessary to form an inital BVP solution guess. 
-%
+% 
 %   Subfunctions: none
 %   Classes required: none
 %   Other m-files required: none
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 20-Aug-2020;
 
 %% ================================================== PARSE CONNECTION PROPERTIES ==================================================
@@ -53,7 +53,6 @@ cData.UnstableTime = globalUnstableCoords(2);  % time of flight captured in the 
 cData.LocalUnstable = unstableLocalMap(globalUnstableCoords(1));
 cData.LocalStable = stableLocalMap(globalStableCoords(1));
 
-% connection = connection2BVP(connectionData, nNode, stableLocalMap, unstableLocalMap);  % test against the old connection2BVP code
 sData = sample_connection_from_stable(stableChart, globalUnstableCoords, globalStableCoords, globalTime);
 uData = sample_connection_from_unstable(unstableChart, globalUnstableCoords, globalTime);
 cData = stitch_together_connection(cData, uData, sData);

@@ -27,7 +27,7 @@ classdef RegCRTBPAtlas < Atlas
     %   MAT-files required: none
     %
     %   Author: Shane Kepley
-    %   email: shane.kepley@rutgers.edu
+    %   email: s.kepley@vu.nl
     %   Date: 22-Apr-2020; Last revision: 22-Apr-2020
     %
     %   ToDo:

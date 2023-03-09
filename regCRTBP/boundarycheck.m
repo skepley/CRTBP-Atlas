@@ -27,7 +27,7 @@ function [addBoundary, addAdvection] = boundarycheck(obj, boundaryChart, maxTau,
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 19-Mar-2019; Last revision: 12-Jun-2019
 
 

@@ -1,5 +1,5 @@
 function newCoordinate = CRTBP2reg(data, mu, mapDirection)
-%CRTBP2REG - Change of coordinates between standard (F0) CRTBP coordinates and regularized (F1/F2) CRTBP coordinates
+%CRTBP2REG - Change of coordinates between physical (F0) CRTBP coordinates and regularized (F1/F2) CRTBP coordinates
 %
 %   Syntax:
 %       newCoordinate = CRTBP2REG(data, mu, 1) returns the F1 regularized coordinates for data specified in F0 coordinates
@@ -8,7 +8,7 @@ function newCoordinate = CRTBP2reg(data, mu, mapDirection)
 %       newCoordinate = CRTBP2REG(data, mu, -2) returns the F0 coordinates for data specified in F2 coordinates
 %
 %   Inputs:
-%       mapDirection: -1, 1, -2, or 2 to compute map or its inverse between F0 and F1/F2 coordinates
+%       mapDirection: -1, 1, -2, or 2 to compute h1 or h2 conjugacy maps or their inverses
 %       mu - The mass of the small primary satisfying 0 < mu <= 0.5
 %       data - An M-by-4 array of row vectors in R^4 for coordinates (xi,pi,yi,qi) for i = 0,1, or 2. 
 %
@@ -21,7 +21,7 @@ function newCoordinate = CRTBP2reg(data, mu, mapDirection)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 04-Apr-2019; Last revision: 12-June-2019
 
 mu1 = 1-mu; % large mass value
@@ -32,7 +32,7 @@ if ~isequal(size(data,2),4)
 end
 
 switch mapDirection
-    case 1 % map from F0 (standard) to F1 (regularized) coordinates
+    case 1 % map from F0 (physical) to F1 (regularized) coordinates
         % unpack coordinates
         x0 = data(:,1); 
         p0 = data(:,2);
@@ -54,7 +54,7 @@ switch mapDirection
         C = CRTBPenergy(data(1,:), mu, 0); % compute energy of regularization
         newCoordinate = [x1,p1,y1,q1,r1,C*ones(size(x1))];
         
-    case -1 % map from F1 (regularized) to F0 (standard) coordinates
+    case -1 % map from F1 (regularized) to F0 (physical) coordinates
         % unpack coordinates
         x1 = data(:,1);
         p1 = data(:,2);
@@ -73,7 +73,7 @@ switch mapDirection
         s0 = 1./sqrt((x0 + mu1).^2 + y0.^2); 
         newCoordinate = [x0,p0,y0,q0,r0,s0];
         
-    case 2 % map from F0 (standard) to F2 (regularized) coordinates
+    case 2 % map from F0 (physical) to F2 (regularized) coordinates
         % unpack coordinates
         x0 = data(:,1); 
         p0 = data(:,2);
@@ -95,7 +95,7 @@ switch mapDirection
         C = CRTBPenergy(data(1,:), mu, 0); % compute energy of regularization
         newCoordinate = [x2,p2,y2,q2,r2,C*ones(size(x2))];
         
-    case -2 % map from F2 (regularized) to F0 (standard) coordinates
+    case -2 % map from F2 (regularized) to F0 (physical) coordinates
         % unpack coordinates
         x2 = data(:,1);
         p2 = data(:,2);

@@ -28,7 +28,7 @@ function [addBoundary, addEvaluation] = advectioncheck(obj, advectionChart, vara
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 19-Mar-2019; Last revision: 19-Apr-2019
 
 %% ---------------------- CRASH CONDITIONS ----------------------

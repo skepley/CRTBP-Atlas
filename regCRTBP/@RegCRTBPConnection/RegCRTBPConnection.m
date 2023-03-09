@@ -37,6 +37,7 @@ classdef RegCRTBPConnection < handle
     properties
         StableChart
         UnstableChart
+        ConnectionEnergy
         LocalIntersection  % [stableSpace, stableTime, unstableSpace] coordinates for the interesection in the local coordinate system which is a subset of D^d
         GlobalIntersection  % [stableSpace, stableTime, unstableSpace, unstableTime] = global coordinates for the intersection:
         ConnectionTime  % time of flight in physical time between source manifold and target manifold
@@ -58,6 +59,7 @@ classdef RegCRTBPConnection < handle
                 
                 obj.StableChart = connectionIntersectionData{1};
                 obj.UnstableChart = connectionIntersectionData{2};
+                obj.ConnectionEnergy = obj.StableChart.RegEnergy;
                 obj.LocalIntersection = [connectionIntersectionData{3}; 0];  % [stableSpace; stableRegTime; unstableSpace; unstableTime]
                 
                 localStablePhysTime = taylorregtime(obj.StableChart, obj.LocalIntersection(2));

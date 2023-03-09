@@ -13,7 +13,7 @@
 %   See also: OTHER_SCRIPT_NAME,  OTHER_FUNCTION_NAME
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 20-Sep-2019; Last revision: 20-Sep-2019
 
 %% ================================================== PLOT AN ATLAS ==================================================

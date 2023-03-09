@@ -1,7 +1,7 @@
 %CHECK_REGCRTBP - testing for RegCRTBPChart class
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 18-Mar-2019; Last revision: 22-Apr-2020
 
 clear all

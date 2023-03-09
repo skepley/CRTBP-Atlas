@@ -13,7 +13,7 @@ function regTau = inverseregtime(obj, F0Tau)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 11-Aug-2020; Last revision: 20-Aug-2020
 
 

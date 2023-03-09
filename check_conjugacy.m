@@ -12,7 +12,7 @@
 %   See also: OTHER_SCRIPT_NAME,  OTHER_FUNCTION_NAME
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 04-Apr-2019; Last revision: 04-Apr-2019
 
 addpath(genpath('/Users/sk2011/Dropbox/Regularisation3bp/integrator'))

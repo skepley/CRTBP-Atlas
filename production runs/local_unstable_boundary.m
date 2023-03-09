@@ -64,9 +64,9 @@ switch source
         SuLocal = mid(Su);
         
         % take equally spaced nodes on the circle
-        theta = linspace(0, 2*pi, numUnstableSegment + 1);
+        theta = linspace(0, 2*pi, numUnstableSegment + 1);  % partition of [0, 2pi]
         nodes = exp(1i*theta);
-        globalSpatialSpan = (theta - pi)/pi;
+        globalSpatialSpan = (theta - pi)/pi;  % partition of [-1, 1]
         
         % lift parameterization
         for k = 1:numUnstableSegment
@@ -120,7 +120,7 @@ function localParmCoordinates = local_L4_unstable(nSegment, globalSpace)
 %       scatter(real(zz), imag(zz))
 
 if isequal(globalSpace, 1)
-    localParmCoordinates = [1, 1];
+    localParmCoordinates = [1, 1];1q
     
 else
     theta = linspace(0, 2*pi, nSegment + 1);

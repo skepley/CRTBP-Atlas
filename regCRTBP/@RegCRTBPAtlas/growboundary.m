@@ -1,7 +1,7 @@
 function growboundary(obj, varargin)
 %GROWBOUNDARY - Overloaded method of the growboundary algorithm for the RegCRTBPAtlas class. 
 %
-%   GROWBOUNDARY() - Performs a single iteration of the following 3 steps: subdivision, advection, and evaluation. This takes k^th generation boundary
+%   GROWBOUNDARY() - Performs a single iteration of the following 3 steps: subdivision, integration, and evaluation. This takes k^th generation boundary
 %   leaves in the chart tree to the (k+1)^st generation boundary by advecting.
 %
 %   Syntax:
@@ -21,7 +21,7 @@ function growboundary(obj, varargin)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 07-Mar-2019; Last revision: 21-Apr-2020
 
 % parse input
@@ -36,10 +36,10 @@ lastCoefficientNorm = p.Results.LastCoefficientNorm;
 regtime = p.Results.RegTime;
 
 boundarycheck = obj.BoundaryCheck; % inherit boundarychecker
-advectioncheck = obj.AdvectionCheck; % inherit advection checker
+advectioncheck = obj.AdvectionCheck; % inherit integration checker
 boundaryStack = obj.LeafStack; % initialize boundary chart stack
-advectionStack = obj.ChartClass; % initialize advection stack
-advectionStack = advectionStack(2:end); % empty the advection stack
+advectionStack = obj.ChartClass; % initialize integration stack
+advectionStack = advectionStack(2:end); % empty the integration stack
 newLeaves = obj.ChartClass; % initialize next generation boundary stack
 newLeaves = newLeaves(2:end); % empty the next generation stack 
 
@@ -49,16 +49,16 @@ while ~isempty(boundaryStack) % ----------- BOUNDARY PHASE -----------
     boundaryStack = boundaryStack(2:end);
     [iBoundary, iAdvection] = boundarycheck(obj, iBoundaryChart, obj.MaxTau); % get new  boundary charts and append to stacks
     boundaryStack = [iBoundary, boundaryStack]; % boundarycheck failures go to front of boundary stack
-    advectionStack = [advectionStack, iAdvection]; % boundarycheck pass goes to back of advection stack
+    advectionStack = [advectionStack, iAdvection]; % boundarycheck pass goes to back of integration stack
     
     while ~isempty(advectionStack) % ----------- ADVECTION PHASE ----------- 
-        jAdvectionChart = advectionStack(1); % pop first chart off advection stack
+        jAdvectionChart = advectionStack(1); % pop first chart off integration stack
         advectionStack = advectionStack(2:end);
         tau = obj.TimeStepper(jAdvectionChart); % get tau from timestepper
-        jAdvectionChart.advect(tau); % convert boundary chart to interior chart by advection
+        jAdvectionChart.advect(tau); % convert boundary chart to interior chart by integration
         jAdvectionChart.rescaletime(lastCoefficientNorm); % rescale timestep to force last coefficient below a given norm
         regtime(jAdvectionChart); % normalize time to the global F0 time scale 
-        [jBoundary, jEvaluationChart] = advectioncheck(obj, jAdvectionChart); % check if advection chart is good. One output is always empty.
+        [jBoundary, jEvaluationChart] = advectioncheck(obj, jAdvectionChart); % check if integration chart is good. One output is always empty.
         
         if isempty(jEvaluationChart) % advectioncheck failed
             boundaryStack = [jBoundary, boundaryStack]; % boundary has been subdivided. Return sub-charts to the boundary stack

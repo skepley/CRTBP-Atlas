@@ -22,7 +22,7 @@ function [meanData, stdData] = energystats(obj, nPts, varargin)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 08-Jul-2019; Last revision: 08-Jul-2019
 
 %% parse input 

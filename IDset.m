@@ -12,7 +12,7 @@ function initialData = IDset(mu, N, isValid)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 10-Apr-2019; Last revision: 19-May-2019
 
 warning('This function is deprecated')

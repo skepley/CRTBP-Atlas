@@ -21,7 +21,7 @@ function energy = CRTBPenergy(v, parameter, regType)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 04-Apr-2019; Last revision: 14-Apr-2019
 
 % unpack coordinates

@@ -22,7 +22,7 @@ function orbit = condense_bvp_data(bvpData)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 03-Mar-2022; Last revision: 03-Mar-2022
 
 nSegment = numel(bvpData.Orbit);

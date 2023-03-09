@@ -14,7 +14,7 @@
 %   See also: OTHER_SCRIPT_NAME,  OTHER_FUNCTION_NAME
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 19-May-2021; Last revision: 19-May-2021
 
 %% ================================================== SECTION 1 ==================================================

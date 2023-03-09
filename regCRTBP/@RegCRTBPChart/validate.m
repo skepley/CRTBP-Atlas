@@ -19,7 +19,7 @@ function varargout = validate(obj, varargin)
 %   MAT-files required: none
 %
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 07-Mar-2019; Last revision: 18-Mar-2019
 
 if ~strcmp(obj.NumericalClass, 'intval')

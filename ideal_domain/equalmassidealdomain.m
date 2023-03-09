@@ -22,7 +22,7 @@ function bestCoordinate = equalmassidealdomain(u, regType)
 %   MAT-files required: none
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 17-Apr-2020; Last revision: 15-Jun-2020
 
 mu = 1/2;

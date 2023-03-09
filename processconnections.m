@@ -12,7 +12,7 @@
 %   See also: OTHER_SCRIPT_NAME,  OTHER_FUNCTION_NAME
 
 %   Author: Shane Kepley
-%   email: shane.kepley@rutgers.edu
+%   email: s.kepley@vu.nl
 %   Date: 18-Jun-2019; Last revision: 18-Jun-2019
 
 %% process solutions
