@@ -1,1 +1,4 @@
 *.png
+*.m~
+*.DS_store
+*.mat
