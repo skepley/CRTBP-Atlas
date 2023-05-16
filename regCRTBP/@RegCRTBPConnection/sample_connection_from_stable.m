@@ -2,18 +2,14 @@ function sData = sample_connection_from_stable(obj, globalPhysTime)
 %SAMPLE_CONNECTION_FROM_STABLE - Given a candidate intersection for two charts, follow it backward through the chart lineage
 % (forward in time) to the local stable manifold. Evaluation is returned in separate strands for each RegType.
 %
-%   Syntax:
-%       output = SAMPLE_CONNECTION_FROM_STABLE(input)
+% Inputs:
+%   - obj: Connection object containing necessary data for the traversal
+%   - globalPhysTime: Global physical time vector specifying nodes for evaluation
 %
-%   Inputs:
-%       input1 - Description
-%       input2 - Description
+% Outputs:
+%   - sData: Struct containing the sampled connection data
 %
-%   Outputs:
-%       output1 - Description
-%       output2 - Description 
-%
-%   Subfunctions: none
+%   Subfunctions: sample_strand, sample_chart, find_first_diff
 %   Classes required: none
 %   Other m-files required: none
 %   MAT-files required: none
@@ -53,10 +49,17 @@ sData.Tau{1} = sData.Tau{1}(:, [1, 3:end]);  % remove the connection time betwee
 end % end sample_connection_from_stable
 
 
-
-
 function [strandOrbit, strandTau] = sample_strand(chartVector, timeNodes,  globalSpatialCoordinate)
 % SAMPLE_STRAND - sample a connecting orbit along a single strand of charts corresponding to a constant RegType
+%
+% Inputs:
+%   - chartVector: Array of chart objects forming a strand
+%   - timeNodes: Vector of time nodes to evaluate the strand
+%   - globalSpatialCoordinate: Global spatial coordinate for evaluation
+% Outputs:
+%   - strandOrbit: Evaluated orbit along the strand
+%   - strandTau: Shooting times for the evaluated orbit
+
 
 % Check if terminal point of first chart is already in evaluation nodes. If so, initialize empty arrays. If not, evaluate it
 % to initialize arrays.
@@ -89,6 +92,18 @@ end
 
 function [evals, tau, terminalOffset] = sample_chart(chart, fullNodes, terminalOffset, globalSpatialCoordinate)
 % SAMPLE_CHART - sample a connecting orbit at given time nodes for a single Chart.
+%
+% Inputs:
+%   - chart: Chart object to be evaluated
+%   - fullNodes: Full set of time nodes for evaluation
+%   - terminalOffset: Offset for terminal point evaluation
+%   - globalSpatialCoordinate: Global spatial coordinate for evaluation
+%
+% Outputs:
+%   - evals: Evaluated orbit points in the chart
+%   - tau: Shooting times for the evaluated points
+%   - terminalOffset: Offset for the terminal point of the chart
+
 
 chartNodes = fullNodes(min(chart.TimeSpan) <= fullNodes & fullNodes <= max(chart.TimeSpan));  % identify all global F0 time nodes (if any) which lie in this chart's timespan
 nChartNodes = length(chartNodes);  % count how many evaluation nodes lie in this chart
@@ -112,6 +127,13 @@ end
 
 function idx = find_first_diff(arr)
 % Find the least index where the specified vector changes value
+%
+% Inputs:
+%   - arr: Input vector to find the first difference
+% Outputs:
+%   - idx: Index of the first difference in the vector
+
+
 idx = find(arr ~= arr(1), 1, 'first');
 if isempty(idx)
     idx = length(arr) + 1;
