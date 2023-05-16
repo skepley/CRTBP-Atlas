@@ -1,24 +1,24 @@
-function [addBoundary, addAdvection] = boundarycheck(obj, boundaryChart, maxTau, varargin)
+function [addBoundary, addIntegration] = boundarycheck(obj, boundaryChart, maxTau, varargin)
 %BOUNDARYCHECK - Boundary check algorithm for RegCRTBPChart atlases
 %
 %   BOUNDARYCHECK() - Checks the fitness of a boundary chart for the reguarlized CRTBP. The outcome
 %   of this check can be one of the following:
-%       1. Advection - This chart is well suited to continue to the advection phase.
+%       1. Integration - This chart is well suited to continue to the integration phase.
 %       2. Subdivide - This chart violates some condition which can be solved by subdivision.
 %       3. Crash - This chart violates some condition which immediately flags it as a crashed chart. This means
 %           the chart is a terminal boundary chart for the atlas.
 %
 %   Syntax:
-%       [addBoundary, addAdvection] = BOUNDARYCHECK(atlas, bdChart, maxTau)
+%       [addBoundary, addIntegration] = BOUNDARYCHECK(atlas, bdChart, maxTau)
 %
 %   Inputs:
 %       obj - An atlas object containing a collection of d-dimensional charts
 %       boundaryChart - A (d-1)-dimensional Chart object
-%       maxTau - The maximum integration time for which the atlas continues boundaries by advection
+%       maxTau - The maximum integration time for which the atlas continues boundaries by integration
 %
 %   Outputs:
 %       addBoundary - A collection of boundary charts to add to the stack. This happens if the boundarychart was subdivided
-%       addAdvection - A single boundary chart which has passed all fitness checks. This will continue to the advection step
+%       addIntegration - A single boundary chart which has passed all fitness checks. This will continue to the integration step
 %           *** ONE OF THESE OUTPUTS SHOULD ALWAYS BE EMPTY ***
 %
 %   Subfunctions: rule1, rule2, crashnow
@@ -54,12 +54,12 @@ end
 nRule = length(subdivisionRule);
 
 %% ---------------------- CRASH CONDITIONS ----------------------
-% define conditions under which advection of this boundary should immediately stop
+% define conditions under which integration of this boundary should immediately stop
 
 % bdChart has previously crashed
 if boundaryChart.Crash
     warning('A crashed boundary chart was passed into boundarycheck. This should not happen')
-    addAdvection = {}; % pass nothing back out
+    addIntegration = {}; % pass nothing back out
     addBoundary = {};
     return
 end
@@ -98,10 +98,10 @@ if crashNow
     boundaryChart.Crash = true;
     obj.CrashStack = [obj.CrashStack, boundaryChart]; % append crashed boundary to the atlas stack
     addBoundary = {}; % return nothing
-    addAdvection = {};
+    addIntegration = {};
 else
     
-    %% ---------------------- SUBDIVIDE CONDITIONS ----------------------
+    %% ---------------------- FITNESS CHECKS AND SUBDIVISION ----------------------
     % loop through the list of fitness checks (called rules) to determine if this boundary chart violates any of them
     iRule = 1;
     while length(boundaryChart) == 1 && iRule <= nRule
@@ -111,20 +111,20 @@ else
     
     if isempty(boundaryChart) % boundaryChart failed a crashcheck in some fitness test.
         addBoundary = {}; % pass out nothing
-        addAdvection = {};
+        addIntegration = {};
     elseif length(boundaryChart) > 1 % pass subdivided boundaries back to the boundary stack
         addBoundary = boundaryChart;
-        addAdvection = {};
-    else % made it through all subdivision checks. pass to the advection stack
+        addIntegration = {};
+    else % made it through all subdivision checks. pass to the integration stack
         addBoundary = {};
-        addAdvection = boundaryChart;
+        addIntegration = boundaryChart;
     end
 end % end if
 end % end boundarycheck
 
 
 % function crashnow(bdChart)
-% %CRASHNOW - Immediately crashes this chart and returns nothing to the boundary or advection stacks
+% %CRASHNOW - Immediately crashes this chart and returns nothing to the boundary or integration stacks
 %
 % end % crashnow
 
